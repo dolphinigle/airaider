@@ -53,23 +53,26 @@ Abilities (Claude's draft, ranks: used from → reaches):
 
 Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armor break, sword → crit chance.
 
-### Cleave mods (Claude's draft, 2026-10-22)
+### Mods, first rulings (designer, 2026-10-22, from the Cleave draft)
 
-From the general list (fits most attacks):
-- **Fiery / Frosty / Shocking / Dark**: adds some Fire / Frost / Lightning / Chaos damage (or turns the hit into that type)
-- **Brutal**: more damage
-- **Bleeding** (axe): bleed on each foe hit
-- **Stunning** (hammer): stun
-- **Heavy**: knock back 1 rank
-- **Keen** (sword): higher crit chance
-- **Quick**: cooldown −1
+**Cost depends on the ability.** A 0-cooldown ability's mods cost nothing, but their numbers are low: about **10% power per mod** ("a good enough trade"). On abilities with a cooldown, a mod can cost something (such as +1 cd) and be stronger. The designer treated Cleave as a no-cooldown ability ("for skills without cd like this").
 
-Tailored to Cleave (hits two):
-- **Splitting**: with only one foe in reach, it takes both hits (120%), which covers Cleave's weak spot
-- **Carry-through**: overkill damage on one foe spills onto the other
-- **Shattering**: Sundered on both foes, lighter or shorter than Sunder's
-- **Guarding Sweep**: gain a shield for each foe hit
-- **Taunting**: foes hit must target you next round (a taunt on a free hit, following the finding that taunt needs teeth)
-- **Reckless**: more damage; you take more damage until your next turn (fits the wind-up identity)
+**One status per damage type:** Physical → **Bleed**, Chaos → **Poison**, Fire → **Burn**, Lightning → **Shocked**, Frost → **Chilled**.
 
-Open: do mods carry a cost (D-0025 had Fiery cost mana, and mana is gone), or are they pure upgrades whose rarity is the price? Cleave's cooldown.
+**Universal mods so far:**
+
+| mod | effect | notes |
+|---|---|---|
+| **Fiery / Frosty / Charged / Dark** | half the damage turns Fire / Frost / Lightning / Chaos, and +10% damage on top | mutually exclusive |
+| **Brutal** (Physical) | +10% damage, no conversion | the Physical one |
+| **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth about 10% of the damage | the designer thinks statuses get a slightly higher multiplier (for the balancer) |
+| **Lucky** | +5% heads chance (number open) | replaces Keen |
+| **Guarding** | gain a shield equal to 10% of the damage dealt | universal |
+| **Heavy** | knock back 1 rank; 50% **reduced** damage (additive, D-0082; value for the balancer) | rarer |
+| **Stunning** | stun; 50% reduced damage | rarer |
+
+**Not universal:**
+- **Quick**: −1 cooldown. Good, but only for abilities with a cooldown (not Cleave).
+- **Splitting**: for most multi-target (cleave-type) abilities: with fewer targets, the damage condenses onto those left.
+
+Claude's Cleave-only ideas not yet ruled: Carry-through (overkill spills onto the other foe), Shattering (light Sundered on both), Taunting (foes hit must target you next round), Reckless (more damage; take more until your next turn).

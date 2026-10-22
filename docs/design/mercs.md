@@ -71,7 +71,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 **Weapon skills are styles (D-0090). At most one per merc:** Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Shooting or Throwing (D-0091); the rest combine freely. Weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick and name. Attributes of the new ones: Claude's draft.
 
-**Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
+**Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses. **One status per damage type** (designer, 2026-10-22): Physical → Bleed, Chaos → Poison, Fire → Burn, Lightning → Shocked, Frost → Chilled. What each does is open.
 
 ### Check skills (11)
 
