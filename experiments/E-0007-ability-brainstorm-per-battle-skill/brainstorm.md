@@ -112,7 +112,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | sustain | | heal | **Empathic** | you also heal for a share of it | rare |
 | sustain | | heal | **Overflow** | 30% of healing past full HP becomes a shield | rare |
 | over time | none | heal | **Regenerating** | part of the heal comes later as regen, more in total | |
-| self-move | 1 | both | **Advancing / Retreating** | you step forward / back 1 rank | |
+| self-move | 1 | both | **Advancing / Retreating** | you step forward / back 1 rank; +10% more power | designer: "self moves also give bonus"; only moving a foe (Heavy) gives none (Claude reads it as on every ability) |
 | target move | 1 | heal / buff | **Rallying / Sheltering** (Claude's names) | the target ally steps forward / back 1 rank; +10% more power | the 10% applies only when moving **allies**, so on heals and buffs, not damage (designer); designer: "make the healing target move back/front"; moving allies was Leadership's (D-0073) |
 | reach | none | both | **Reaching / Footwork** | reaches 1 rank further / usable from 1 more rank | |
 | scaling | none | dmg | **Executing / Opening Blow** | more the more HP the target has lost / has left | smooth |
