@@ -105,12 +105,13 @@ Families at a glance:
 | conditional | **Lingering** | its statuses last a round longer | inflicts a status |
 | conditional | **Composed** | softens its self-debuff | has one |
 
+**Rejected:** Sweeping (designer: "sweeping bad no").
+
 **Not yet ruled (Claude's):**
 - Piercing: ignores some defense.
 - Bane of \<family\>: more damage against one foe family.
 - Opportunist: more damage against a foe with a status.
 - Taunting: foes hit must target you next round.
-- Sweeping: a single-target ability also hits the next foe for a small share.
 - Cleave-only: Carry-through, Shattering, Reckless.
 
 ### Damage mods (Claude's draft, 2026-10-22; designer asked: "we want more mods that adds effective damage")
