@@ -36,6 +36,13 @@ Designer: "first lets make this fun."
 
 ## Waiting on the designer
 
+- **To decide later (D-0055):**
+  - where recruits come from (coach or quests);
+  - how new quests appear;
+  - stopping steamrolling;
+  - whether skill checks between fights stay.
+- **Now:** are skill checks a big part of the game, or is it mostly combat? If mostly combat, the check skills get merged.
+
 - **Accept D-0041** (combat basics)?
 - **Inspirations offered, not yet picked:**
   - push on or retreat between battles;

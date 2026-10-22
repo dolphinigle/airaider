@@ -33,3 +33,10 @@ The designer's words: "pick quest to do this week, pick squad to go, go, get loo
 - **Spending is the key economic choice:** recovering (stress, injuries) against upgrading (buildings, level caps). Gold must stay tight.
 - **A failed quest still pays a little.** Failure should stay content, not dead air (findings).
 - **A long-term goal** pulls the loop forward (Darkest Dungeon has its final dungeon). Not designed yet.
+
+## To decide later (designer, 2026-10-22)
+
+- **Where recruits come from:** a coach as in Darkest Dungeon, or quests.
+- **How new quests appear.**
+- **Stopping steamrolling:** an experienced merc should not farm easy quests.
+- **Whether skill checks between fights stay.**
