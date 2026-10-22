@@ -90,7 +90,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 
 **How mods work:**
 - **The AI picks.** The engine rolls how many mods an ability gets; the AI sees every mod that fits and picks that many to suit the merc (designer: "the ai will be given all these mods then asked to pick several"). This replaces Claude's D-0025 idea of dealing 3 candidates.
-- **Eligibility is automatic and rare mods are flipped in** (designer: "pick the 3 mods from all the eligible trait list PLUS some rare ones that were 'flipped' to be included in the selection"). Every common mod that fits the ability (by fits, limits and conditions) is offered; each rare mod gets its own flip to join the offer. No hand-tailoring per ability.
+- **Eligibility is automatic and rare mods are flipped in** (designer: "pick the 3 mods from all the eligible trait list PLUS some rare ones that were 'flipped' to be included in the selection"). The engine offers the AI **about 10 random commons** from those that fit (by fits, limits and conditions), plus each rare mod that wins its own flip (designer: "ai should offer like 10 not 6"). No hand-tailoring per ability.
 - **The cost depends on the ability.** On a 0-cooldown ability a mod is free and small, about **10% power** ("a good enough trade"). On an ability with a cooldown, a mod can cost something (such as +1 cd) and be stronger.
 - **Power** is damage on an attack and healing on a heal. **Fits**: dmg (damaging abilities), heal (healing abilities), both.
 - **One damage type per ability.** An element mod **converts all of it** to another type and adds **more** damage (multiplicative, D-0082) on top.
@@ -112,7 +112,8 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | sustain | | heal | **Empathic** | you also heal for a share of it | rare |
 | sustain | | heal | **Overflow** | 30% of healing past full HP becomes a shield | rare |
 | over time | none | heal | **Regenerating** | part of the heal comes later as regen, more in total | |
-| self-move | 1 | both | **Advancing / Retreating** | you step forward / back 1 rank | |
+| self-move | 1 | both | **Advancing / Retreating** | you step forward / back 1 rank; +10% more power | every move mod adds 10% more (designer) |
+| target move | 1 | heal / buff | **Rallying / Sheltering** (Claude's names) | the target ally steps forward / back 1 rank; +10% more power | designer: "make the healing target move back/front"; moving allies was Leadership's (D-0073) |
 | reach | none | both | **Reaching / Footwork** | reaches 1 rank further / usable from 1 more rank | |
 | scaling | none | dmg | **Executing / Opening Blow** | more the more HP the target has lost / has left | smooth |
 | scaling | | heal | **Triage** | more healing the more HP the target has lost | |
@@ -235,18 +236,20 @@ A heal or shield % is measured like damage: 100% heals as much as a standard hit
 
 ### Buff mods, on Bless (designer rulings, 2026-10-22)
 
-Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. On a buff ability, **power is the buff's potency**.
+Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. Buffs don't flip coins for now (designer: "maybe no coin flips").
 
-- **Lasting**: +1 count. **Rare, and adds a lot of cooldown**: "EXTREMELY strong on skills that only give 1 count".
-- **Self-blessing**: you get the buff too. **Rare, and adds a lot of cooldown.**
-- **Hastening / Emboldening / Regenerating**: the target also gets Haste / Emboldened / Regen, under the heal rules (ally buff family, 1 per ability, single target, reduced power).
-- **Guarding**: the target also gains a small shield (about 10% of a standard hit).
-- **Mending**: the target also heals a little (about 20% of a standard hit).
-- **Purifying**: also removes every negative status. **Rare** on buffs (common on heals).
-- Reused unchanged: scaling on your own HP or stress (Desperate, Fresh, Haunted, Serene), double-edged (Reckless; rare Wild, Fraught, Blood Price, Ponderous, Unique), Advancing / Retreating, Swift, Soothing, Calming.
-- **Range mods** (designer: "add the range modifier stuffs"): **Footwork** (usable from 1 more rank: Bless from 2–4) and **Reaching** (reaches 1 rank further). Reaching fits only an ability whose reach is limited; Bless already reaches any ally (Claude).
-- **Echo** (designer: "probably add echo"): small chance to fire again, one repeat at most; it is Double Strike under its non-attack name (Claude: the repeat may pick a second ally).
-- **Rejected:** Spreading ("bad"); Triage / Comforting on buffs ("'stronger buff' makes no sense").
-- Dropped as not fitting: element, status, debuffs, Vampiric, Executing / Opening Blow, Opportunist, Crushing, Splitting, Quick / Measured, Composed.
-- **No coin flips on buffs, for now** (designer: "unsure what coin flip does for skills like this, maybe no coin flips"), so the coin mods don't fit buff abilities.
-- Lingering is rare and adds a lot of cooldown too (designer: "Lingering yes").
+**Potency decides the pool** (designer): on a buff or debuff ability whose effect has potency, "more" raises the potency, so scaling and more-power mods fit. They are dropped only where the effect has **no potency**, like Bless ("the pool is small ONLY for skills like this"; Claude reads this as Blessed being count only, to confirm).
+
+Bless's mods (10 common, 7 rare):
+- **Extra buff on the target** (1, single target, reduced power, as on heals): Hastening / Emboldening / Regenerating
+- **Sustain:** Guarding (a small shield, about 10% of a standard hit), Mending (a small heal, about 20%)
+- **Moves:** Advancing / Retreating (you), Rallying / Sheltering (the target)
+- **Self buff:** Swift
+- **Range:** Footwork (usable from 2–4). Reaching only fits a limited reach, not Bless's any ally.
+- **Repeat:** Echo (Double Strike under its non-attack name; one repeat at most)
+- **Rare:** Purifying; Lasting (+1 count) and Self-blessing (you get it too), both adding a lot of cooldown; Soothing; Calming
+- Once Lasting or Self-blessing gives Bless a cooldown, Quick and Measured fit too.
+
+**Rejected:**
+- Spreading, Warding, Steadying, Inspiring, Twin ("bad").
+- Triage / Comforting and the scaling and more-power mods on potency-less buffs.
