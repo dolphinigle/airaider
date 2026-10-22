@@ -1,11 +1,11 @@
 ---
 id: D-0027
 title: Recruits have half-star rarity that sets their modifier odds
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0067
 evidence: [E-0004]
 sources: []
 ---

@@ -33,7 +33,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0024](D-0024-losing-a-fight-injures-never-kills.md) | Losing a fight injures, never kills | accepted | designer | 2026-10-21 |
 | [D-0025](D-0025-battle-skills-are-base-skills-plus-engine-priced-modifiers-n.md) | Battle skills are base skills plus engine-priced modifiers, named by the AI | proposed | designer | 2026-10-21 |
 | [D-0026](D-0026-quests-resolve-through-autobattles-and-pure-coin-flip-skill-.md) | Quests resolve through autobattles and pure coin-flip skill checks | superseded → D-0053 | designer | 2026-10-21 |
-| [D-0027](D-0027-recruits-have-half-star-rarity-that-sets-their-modifier-odds.md) | Recruits have half-star rarity that sets their modifier odds | accepted | designer | 2026-10-21 |
+| [D-0027](D-0027-recruits-have-half-star-rarity-that-sets-their-modifier-odds.md) | Recruits have half-star rarity that sets their modifier odds | superseded → D-0067 | designer | 2026-10-21 |
 | [D-0028](D-0028-a-merc-rolls-one-new-battle-skill-per-level-up-and-equips-fo.md) | A merc rolls one new battle skill per level up and equips four | superseded → D-0033 | designer | 2026-10-21 |
 | [D-0029](D-0029-rare-items-raise-a-merc-s-star-or-reroll-their-seed-resettin.md) | Rare items raise a merc's star or reroll their seed, resetting their level | accepted | designer | 2026-10-21 |
 | [D-0030](D-0030-a-tactic-is-three-parts-condition-action-target.md) | "A tactic is three parts: condition, action, target" | accepted | designer | 2026-10-21 |
@@ -53,7 +53,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0044](D-0044-six-stats-per-folds-into-dex-wil-takes-willpower-from-con.md) | "Six stats: PER folds into DEX, WIL takes willpower from CON" | accepted | designer | 2026-10-22 |
 | [D-0045](D-0045-unarmed-is-its-own-core-skill-no-medium-weapons-weapon-tags-.md) | Unarmed is its own core skill, no medium weapons, weapon tags filter base abilities | accepted | designer | 2026-10-22 |
 | [D-0046](D-0046-fighting-skills-the-core-skills-that-give-abilities.md) | "Fighting skills: the core skills that give abilities" | superseded → D-0058 | designer | 2026-10-22 |
-| [D-0047](D-0047-abilities-10-to-20-bases-per-fighting-skill-the-ai-picks-one.md) | "Abilities: 10 to 20 bases per fighting skill, the AI picks one of a few dealt and renames it" | accepted | designer | 2026-10-22 |
+| [D-0047](D-0047-abilities-10-to-20-bases-per-fighting-skill-the-ai-picks-one.md) | "Abilities: 10 to 20 bases per fighting skill, the AI picks one of a few dealt and renames it" | superseded → D-0067 | designer | 2026-10-22 |
 | [D-0048](D-0048-players-see-only-the-ai-name-of-an-ability-never-its-base.md) | Players see only the AI name of an ability, never its base | accepted | designer | 2026-10-22 |
 | [D-0049](D-0049-every-merc-s-first-ability-is-a-0-cooldown-attack.md) | Every merc's first ability is a 0 cooldown attack | superseded → D-0050 | designer | 2026-10-22 |
 | [D-0050](D-0050-first-ability-is-a-0-cooldown-attack-drawn-from-the-merc-s-s.md) | "First ability is a 0 cooldown attack drawn from the merc's skills, or from generic attacks" | accepted | designer | 2026-10-22 |
@@ -72,4 +72,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0063](D-0063-melee-splits-into-fast-cleaving-heavy-and-long-reach-weapons.md) | Melee splits into Fast, Cleaving, Heavy and Long-reach weapons | proposed | designer | 2026-10-22 |
 | [D-0064](D-0064-attributes-affect-combat-only-indirectly.md) | Attributes affect combat only indirectly | superseded → D-0065 | designer | 2026-10-22 |
 | [D-0065](D-0065-damage-attribute-coins-times-ability-base-cut-by-defense-per.md) | Damage: attribute coins times ability base, cut by defense percent; foes scale by HP | accepted | designer | 2026-10-22 |
+| [D-0066](D-0066-merc-defense-shield-and-guard-percent-only-from-traits-no-mi.md) | Merc defense: shield and guard, percent only from traits; no misses; eight damage types | accepted | designer | 2026-10-22 |
+| [D-0067](D-0067-skills-level-up-to-grant-abilities-skills-have-stars-that-se.md) | Skills level up to grant abilities; skills have stars that set modifier odds | accepted | designer | 2026-10-22 |
 <!-- index:end -->

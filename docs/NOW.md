@@ -22,13 +22,13 @@
 
 ### Mercs ([design/mercs.md](design/mercs.md))
 - **Stats:** STR DEX INT CHA CON WIL (D-0044). DEX gives speed coins, CON gives max HP, WIL is the stress check.
-- **Rarity:** half-star, sets modifier odds (D-0027).
+- **Stars** (D-0067): every skill has a star (1★–5★, half steps) that sets its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
   - **Battle skills** (18, give abilities) and **check skills** (give none) are separate, with their own quotas: working 3 battle + 2 check. Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
-  - One new ability per level up. The AI picks one of a few dealt bases from the merc's fighting skills and renames it. Never the same base twice. Four equipped (D-0047).
+  - A merc level up gives attributes only. **A battle-skill level up gives one new ability**: the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0067).
   - 10–20 bases per fighting skill (D-0047).
   - Weapon tags filter bases; Unarmed is its own skill; no medium tier (D-0045).
   - Dark Magic abilities cost HP; guns are a Ranged weapon tag (D-0060).
@@ -64,7 +64,9 @@
 ## Next
 
 0. **Battle skills first, check skills later** (designer). Open now:
-   - **Damage model locked** (D-0065, E-0006): attribute coins (10 → 20) × ability base (rises with skill level), foe defense % per type, status on a skill flip, foes scale by HP. Open: merc defense (shield? % per type? dodges?), damage types, attribute per battle skill.
+   - **Damage model locked** (D-0065, E-0006): attribute coins (10 → 20) × ability base (rises with skill level), foe defense % per type, status on a skill flip, foes scale by HP. Open: attribute per battle skill.
+   - **Defense locked** (D-0066): mercs defend with shield, guard and buffs; % per type only from traits/gear; no misses, dodge is a charge; 8 damage types (Slash, Pierce, Blunt, Fire, Frost, Lightning, Holy, Dark).
+   - **Skill stars** (D-0067) open: what a check skill's star does (Claude: growth speed); skill level = skill coins?
    - **Melee split** (D-0063, proposed): Fast, Cleaving, Heavy, Long-reach.
    - **Elemental:** one skill with element tags (Claude) or split?
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).

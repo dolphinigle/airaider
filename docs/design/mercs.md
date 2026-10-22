@@ -76,7 +76,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 ## Level up
 
-**Stats grow at random: exactly three coins per level, at most one per stat** (D-0018):
+**A merc level up grants attributes only** (D-0067). **Stats grow at random: exactly three coins per level, at most one per stat** (D-0018):
 1. one coin on a random talented stat;
 2. one coin on the second talented stat with a 50% chance; on a miss, or with no second talented stat, it goes to a random stat;
 3. one coin on a random stat.
@@ -85,9 +85,11 @@ Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875
 
 **The player's choice is a skill** (D-0035): a merc **starts with two skills** (a third is rare, likelier at higher stars), and at **Lv 7** learns one more, **picking 1 of 3**, hidden until then. The options are rolled at recruitment (weighted by race and background, from skills the merc lacks).
 
-## Rarity (D-0027)
+## Stars (D-0067)
 
-Every merc has a **rarity from 1★ to 5★ in half steps**, rolled at recruitment. For now it affects only modifiers: each ability the merc gets rolls 0–4 modifiers, more often at higher stars (four on about 0.1% of a 5★'s skills). Higher stars get more common as the game goes on. Working odds: E-0004 `halfstar.mjs`.
+- **Every skill has a star**, 1★–5★ in half steps (talent), battle and check skills alike. A battle skill's star sets its abilities' modifier odds: 0–4 modifiers, more at higher stars (four on about 0.1% of a 5★ skill's abilities). Working odds: E-0004 `halfstar.mjs`, now per skill.
+- **A merc's star** (1★–5★, half steps, rolled at recruitment) makes their skills likelier to roll high stars. Higher stars get more common as the game goes on.
+- Open: what a check skill's star does (Claude: growth speed).
 
 ## Abilities (D-0031, D-0047)
 
@@ -96,7 +98,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - Every merc's **first ability is a 0-cooldown attack**, a normal ability: from their skills (most skills have one, e.g. Light Weapons' Double Attack) or, as a fallback, a **generic** attack anyone can get (Smash, Kick) (D-0050); generic bases can also come up, rarely, on any level up (D-0051).
 - The player sees only the AI name, never the base (D-0048).
 - Only **battle skills** give abilities (D-0058). Each has **about 10–20 base abilities**; weapon tags filter them (D-0045).
-- **Every level up gives one new ability**, with modifiers by star. The engine deals the AI a few random bases from the merc's fighting skills that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
+- **Every battle-skill level up gives one new ability** from that skill, with modifiers by the skill's star (D-0067). A merc level up gives attributes only. The engine deals the AI a few random bases from that skill that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
 - **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: +10% damage, −10% speed", "Stubborn: can't be stunned while above half HP".

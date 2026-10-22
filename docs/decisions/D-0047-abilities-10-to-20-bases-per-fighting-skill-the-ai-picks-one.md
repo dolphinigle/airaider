@@ -1,11 +1,11 @@
 ---
 id: D-0047
 title: "Abilities: 10 to 20 bases per fighting skill, the AI picks one of a few dealt and renames it"
-status: accepted
+status: superseded
 date: 2026-10-22
 decided-by: designer
 supersedes: [D-0033]
-superseded-by:
+superseded-by: D-0067
 evidence: [E-0003]
 sources: []
 ---
