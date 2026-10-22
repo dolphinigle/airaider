@@ -146,3 +146,18 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | **Push** | 2★ | 2–3 → foe 1 | 70% | pushes the foe back 1 rank | cd 2 |
 | **Impale** | 2★ | 2–3 → foe 1–2 | 130% | Bleed | cd 3 |
 | **Sweep** | 3★ | 2–3 → foe 1 and 2 | 50% each | hits both front foes | cd 2 |
+
+## The five magics, identities (Claude's draft, 2026-10-22; designer: "lets design identities for all 5 magics first together")
+
+| magic | attr | ranks | damage / status | role | the decision it brings |
+|---|---|---|---|---|---|
+| **Fire** | STR + INT | 2–3 | Fire / Burn | the battle mage: hits groups, Burn ticks on many foes; strongest against swarms | spread Burn over many foes, or pile it on one |
+| **Frost** | DEX + INT | 3–4 | Frost / Chilled | control: Chilled foes act later, so it bends turn order; single-target lances and ice shields for allies | who acts first: slow the dangerous foe before it moves |
+| **Lightning** | INT | 3–4 | Lightning / Shocked | burst: hits jump between foes, the most coin-swingy magic; Shocked foes take more from the next hit | gamble on the swing, and set up the squad's next hit |
+| **Holy** | CHA | 2–4 | Physical / none | the priest: steady heals on cooldowns, shields, blessings; hits undead hard | heal now, or prevent damage with wards and blessings |
+| **Dark** | CHA + CON | 2–4 | Chaos / Poison | power at a price: every ability costs stress (D-0072); curses foes (Weakened, Exposed), Poison, pacts | how much stress to spend this fight |
+
+How they split the work:
+- **Fire vs Lightning (both damage):** Fire is wide and slow-burning (Burn over rounds); Lightning is sharp and swingy (big jumps now, Shocked for the next hit).
+- **Holy vs Doctor (both heal):** Holy heals on cooldowns, smaller and steady; Doctor heals in bursts with uses per quest (D-0062).
+- **Frost vs Dark (both weaken foes):** Frost controls when foes act; Dark weakens what they do.
