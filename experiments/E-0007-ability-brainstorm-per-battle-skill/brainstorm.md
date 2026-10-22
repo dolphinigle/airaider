@@ -155,7 +155,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | **Frost** | DEX + INT | 3–4 | Frost / Chilled | single target; Chilled; shields on the caster |
 | **Lightning** | INT | 3–4 | Lightning / Shocked | the biggest direct damage; Shocked makes the next hit deal more; area damage by chaining |
 | **Holy** | CHA | 2–4 | Physical / none | healing, some buffs, a weak shield, weak damage; no bonus against undead ("holy is already stacked") |
-| **Dark** | CHA + CON | 2–4 | Chaos / none | self-stressing (D-0072), debuffs, a rare source of Chaos damage; **no Poison** |
+| **Dark** | CHA + CON | 2–4 | Chaos / none | self-stressing (D-0072), debuffs, **healing paid with stress**, a rare source of Chaos damage; **no Poison** |
 
 **Statuses by damage type, clarified** (designer: "poison deals chaos damage but not caused by chaos magic"): the status-per-type rule says which damage each status deals (Poison deals Chaos). It does not mean every source of that damage type inflicts it. Poison comes from other skills (Alchemy, Poisoning mods).
 
