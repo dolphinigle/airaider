@@ -44,7 +44,7 @@
 - **Combat basics** (D-0041, proposed, the designer called it "decent"):
   - **Formation:** a Darkest Dungeon line, 4 ranks per side. Abilities state the ranks they're used from and the ranks they reach. No corpses: units shift forward.
   - **Turn order:** speed coins re-flipped every round, everyone acts once. Haste and Slow change it.
-  - **Ability flips:** stat + skill coins (two-skill abilities average the two skills); damage = heads × base.
+  - **Ability flips:** skill coins only (two-skill abilities average the two); attributes work indirectly (D-0064); damage = heads × base.
   - **Costs:** cooldowns only; no mana, no stamina.
   - **Guard:** taunts, or shields (the shield can cover the party).
   - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
@@ -64,7 +64,7 @@
 ## Next
 
 0. **Battle skills first, check skills later** (designer). Open now:
-   - **Attributes stay** (designer: "we still want them because they are used for skill checks"). Open: do they affect combat? Options: A checks only; B derived only (CON HP, DEX speed, WIL stress); C one fixed stat per battle skill, ability flips skill + that stat, plus the B hooks (Claude recommends C: STR Cleaving/Heavy/Long-reach/Villainy; DEX Fast/Unarmed/Ranged/Stealth; INT Warfare/Doctor/Alchemy/Elemental; CHA Leadership/Performance/Holy/Animal Companion; CON Defense; WIL Dark).
+   - **Attributes stay for checks; in combat only indirectly** (D-0064: CON → HP). Abilities flip skill coins only. Open: Claude's hooks (STR phys dmg %, DEX speed, INT magic dmg % + status length, CHA heal/buff %, CON HP, WIL stress).
    - **Melee split** (D-0063, proposed): Fast, Cleaving, Heavy, Long-reach.
    - **Elemental:** one skill with element tags (Claude) or split?
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).

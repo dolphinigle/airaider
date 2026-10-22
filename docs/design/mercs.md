@@ -4,16 +4,16 @@ What a merc is made of (stats, skills, talents, level) and how they grow.
 
 ## Stats (D-0044)
 
-Six stats, each a number of **coins**:
+Six stats, each a number of **coins**. They pool with skills in **skill checks**; in combat they work **only indirectly** (D-0064): abilities flip skill coins only.
 
 | stat | covers | in a fight |
 |---|---|---|
-| **STR** | strength | heavy melee |
-| **DEX** | agility, hands, reflexes, aim | **speed coins**; light weapons, ranged |
-| **INT** | intelligence | magic, lore |
-| **CHA** | charisma | holy magic, rallying, fear, songs |
-| **CON** | endurance, toughness | **max HP**; defense |
-| **WIL** | willpower: nerve, fear, curses, focus | the **stress check** (D-0042) |
+| **STR** | strength | physical damage +% (proposed) |
+| **DEX** | agility, hands, reflexes, aim | **speed coins** |
+| **INT** | intelligence | magic damage +%, longer statuses (proposed) |
+| **CHA** | charisma | healing and buffs +% (proposed) |
+| **CON** | endurance, toughness | **max HP** |
+| **WIL** | willpower: nerve, fear, curses, focus | the **stress check** (D-0042); stress builds slower (proposed) |
 
 Starting stats are a little randomized, biased by **race**; a wolfkin leans DEX (D-0018).
 
