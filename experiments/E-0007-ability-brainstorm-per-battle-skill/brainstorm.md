@@ -53,53 +53,48 @@ Abilities (Claude's draft, ranks: used from → reaches):
 
 Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armor break, sword → crit chance.
 
-### Mods, first rulings (designer, 2026-10-22, from the Cleave draft)
+### Mod catalog (designer rulings, 2026-10-22, from the Cleave draft)
 
-**Cost depends on the ability.** A 0-cooldown ability's mods cost nothing, but their numbers are low: about **10% power per mod** ("a good enough trade"). On abilities with a cooldown, a mod can cost something (such as +1 cd) and be stronger. The designer treated Cleave as a no-cooldown ability ("for skills without cd like this").
+**How mods work:**
+- **The AI picks.** The engine rolls how many mods an ability gets; the AI sees every mod that fits and picks that many to suit the merc (designer: "the ai will be given all these mods then asked to pick several"). This replaces Claude's D-0025 idea of dealing 3 candidates.
+- **The cost depends on the ability.** On a 0-cooldown ability a mod is free and small, about **10% power** ("a good enough trade"). On an ability with a cooldown, a mod can cost something (such as +1 cd) and be stronger.
+- **Statuses: one per damage type.** Physical → Bleed, Chaos → Poison, Fire → Burn, Lightning → Shocked, Frost → Chilled.
+- **Caps and exclusions:**
+  - one element;
+  - at most **one debuff-family mod** per ability; debuff mods cost **50% reduced damage** (value for the balancer) and are **never offered on multi-foe abilities**;
+  - at most **one buff-family mod** (buffs on the user);
+  - Advancing and Retreating exclude each other;
+  - several status mods may stack.
+- **Universal but conditional:** a mod fits any ability that meets its condition.
 
-**One status per damage type:** Physical → **Bleed**, Chaos → **Poison**, Fire → **Burn**, Lightning → **Shocked**, Frost → **Chilled**.
+| family | mod | effect | rules |
+|---|---|---|---|
+| element | **Fiery / Frosty / Charged / Dark** | half the damage turns Fire / Frost / Lightning / Chaos, +10% damage | one element |
+| element | **Brutal** | +10% damage, stays Physical | one element |
+| status | **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth ~10% of the damage (statuses may get a slightly higher multiplier, balancer) | may stack |
+| debuff | **Stunning** | stun | rarer; 50% reduced damage; single-target only; one debuff |
+| debuff | **Heavy** | knock the target back 1 rank | same |
+| debuff | **Marking** | mark: allies deal more to it | same |
+| debuff | **Exposing / Weakening / Hampering** (Claude's, likely in the family) | takes more damage / deals less / acts later | same |
+| buff | **Swift** | you act earlier next round | one buff |
+| buff | **Guarding** | shield worth 10% of the damage dealt | one buff (Claude puts it here) |
+| buff | **Evasive / Riposting** (Claude's) | gain a dodge / riposte charge | one buff; rarer |
+| self-move | **Advancing / Retreating** (designer) | you step forward / back 1 rank | exclusive |
+| reach | **Reaching** | reaches 1 rank further (foe 1–2 → 1–3) | |
+| reach | **Footwork** | usable from 1 more rank (from 1–2 → 1–3) | |
+| other | **Lucky** | +5% heads chance (number open) | replaces Keen |
+| other | **Vampiric** | heal a small share of the damage | rare |
+| other | **Double Strike** | small chance to hit again | at most one repeat |
+| conditional | **Quick** | −1 cooldown | has a cooldown |
+| conditional | **Splitting** | with fewer targets, damage condenses onto those left | hits several foes |
+| conditional | **Potent** | its statuses are stronger | inflicts a status |
+| conditional | **Lingering** | its statuses last a round longer | inflicts a status |
+| conditional | **Composed** | softens its self-debuff | has one |
 
-**Universal mods so far:**
-
-| mod | effect | notes |
-|---|---|---|
-| **Fiery / Frosty / Charged / Dark** | half the damage turns Fire / Frost / Lightning / Chaos, and +10% damage on top | mutually exclusive |
-| **Brutal** (Physical) | +10% damage, no conversion | the Physical one |
-| **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth about 10% of the damage | the designer thinks statuses get a slightly higher multiplier (for the balancer) |
-| **Lucky** | +5% heads chance (number open) | replaces Keen |
-| **Guarding** | gain a shield equal to 10% of the damage dealt | universal |
-| **Heavy** | knock back 1 rank; 50% **reduced** damage (additive, D-0082; value for the balancer) | rarer |
-| **Stunning** | stun; 50% reduced damage | rarer |
-
-**How mods are picked (designer, 2026-10-22):** "the ai will be given all these mods then asked to pick several (depends on the number of mods rolled on the skill)". The engine rolls the count; the AI sees every mod that fits the ability and picks that many to suit the merc. This replaces Claude's D-0025 proposal of dealing 3 candidates. The engine still enforces the exclusive groups (one element).
-
-**More rulings (designer, 2026-10-22):**
-- **Mods that reduce damage are mutually exclusive** with each other (Heavy, Stunning).
-- **An ability can carry several status mods.**
-- **Quick and Splitting are universal but conditional**: they fit any ability that meets the condition (it has a cooldown; it hits several foes).
-- New: **Reaching**: reaches one rank further (foe 1–2 becomes 1–3). **Footwork** (Claude's name): usable from one more rank (from 1–2 becomes 1–3).
-
-Claude's Cleave-only ideas not yet ruled: Carry-through (overkill spills onto the other foe), Shattering (light Sundered on both), Taunting (foes hit must target you next round), Reckless (more damage; take more until your next turn).
-
-### More mod suggestions (Claude's draft, 2026-10-22)
-
-Universal:
-- **Marking**: marks the target; allies deal more to it (Darkest Dungeon Mark)
-- **Exposing**: the target takes more damage until its next turn
-- **Weakening**: the target deals less damage on its next turn
-- **Hampering**: the target acts later next round (speed down)
-- **Swift**: you act earlier next round (speed up)
-- **Piercing**: ignores some of the target's defense
-- **Bane of <family>**: more damage against one foe family (beasts, undead, cultists); the AI picks the family to fit the merc (foe twists make matchups matter, E-0003)
-- **Opportunist**: more damage against a foe that has any status
-- **Vampiric**: heal for a small share of the damage (Dark Magic has no life drain, D-0072; a mod may be fine, the designer rules)
-- **Evasive**: gain a dodge charge (rarer)
-- **Riposting**: gain a riposte charge (rarer)
-- **Taunting**: foes hit must target you next round
-- **Double Strike**: small chance to hit again (rarer)
-
-Conditional:
-- **Potent**: statuses this ability inflicts are stronger (it inflicts a status)
-- **Lingering**: those statuses last a round longer (it inflicts a status)
-- **Composed**: softens the ability's self-debuff (it has one, like Titanic Swing's Stagger)
-- **Sweeping**: a single-target ability also hits the next foe for a small share (it hits one foe)
+**Not yet ruled (Claude's):**
+- Piercing: ignores some defense.
+- Bane of \<family\>: more damage against one foe family.
+- Opportunist: more damage against a foe with a status.
+- Taunting: foes hit must target you next round.
+- Sweeping: a single-target ability also hits the next foe for a small share.
+- Cleave-only: Carry-through, Shattering, Reckless.
