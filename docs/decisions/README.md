@@ -88,4 +88,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0079](D-0079-wil-out-luk-in-luck-raises-every-coin-s-heads-odds.md) | WIL out, LUK in: luck raises every coin's heads odds | accepted | designer | 2026-10-22 |
 | [D-0080](D-0080-attribute-passives.md) | Attribute passives | superseded → D-0081 | designer | 2026-10-22 |
 | [D-0081](D-0081-attribute-passives-count-from-a-baseline-of-10.md) | Attribute passives count from a baseline of 10 | accepted | designer | 2026-10-22 |
+| [D-0082](D-0082-percent-modifiers-use-path-of-exile-increased-and-more.md) | Percent modifiers use Path of Exile increased and more | accepted | designer | 2026-10-22 |
 <!-- index:end -->

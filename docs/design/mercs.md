@@ -4,16 +4,18 @@ What a merc is made of (stats, skills, talents, level) and how they grow.
 
 ## Stats (D-0079)
 
+**Percent effects use Path of Exile wording (D-0082):** *increased/reduced* add together into one multiplier; each *more/less* multiplies on its own. Final = base × (1 + Σ increased − Σ reduced) × Π(1 ± more/less).
+
 Six stats, each a number of **coins**, about **10 → 20** over a career. Checks and attacks flip **attribute + skill level** (D-0069); statuses land on a separate skill flip. Foes scale by HP.
 
 Each stat also has a small **passive**, counted from **10 = no effect**: above helps, below hurts (D-0081):
 
 | stat | covers | skills | passive |
 |---|---|---|---|
-| **STR** | strength | its battle and check skills | **±1% damage per point from 10**, on all damage |
+| **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (reduced below), on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
-| **INT** | intelligence | its battle and check skills | **XP**, merc and every skill (±3–5% per point from 10, designer; working 3%) |
-| **CHA** | charisma | its battle and check skills | **quest gold**: **summed over the squad** (designer), each merc ±1% per point from 10 (working) |
+| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (3–5% per point from 10, designer; working 3%; reduced below) |
+| **CHA** | charisma | its battle and check skills | **increased quest gold**: **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
 | **LUK** | luck | none | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
 
@@ -112,7 +114,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - **Some battle-skill level ups give a new ability** from that skill, not every one (D-0069; working: skill levels 1, 3, 5, 7, 9), with modifiers by the skill's star. A merc level up gives attributes only. The engine deals the AI a few random bases from that skill that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
-- **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: +10% damage, −10% speed", "Stubborn: can't be stunned while above half HP".
+- **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: 10% increased damage, 10% reduced speed", "Stubborn: can't be stunned while above half HP".
 
 ## Stress (D-0042)
 
