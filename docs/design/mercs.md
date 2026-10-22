@@ -75,7 +75,7 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
 | **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | CHA |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
-| **Craft** | building, machines, explosives, traps; weapons, armor, repairs (Engineering + Smithing) | INT |
+| **Craft** | building, machines, explosives, traps; weapons, armor, repairs (Engineering + Smithing) | STR + INT (designer) |
 
 ## Talents (D-0018)
 
