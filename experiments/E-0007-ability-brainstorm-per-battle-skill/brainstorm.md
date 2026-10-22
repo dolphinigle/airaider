@@ -111,3 +111,37 @@ Families at a glance:
 - Taunting: foes hit must target you next round.
 - Sweeping: a single-target ability also hits the next foe for a small share.
 - Cleave-only: Carry-through, Shattering, Reckless.
+
+### Damage mods (Claude's draft, 2026-10-22; designer asked: "we want more mods that adds effective damage")
+
+Situational mods give more than 10% when their condition holds (about +25%), so they average out near 10%.
+
+Coins (unique to our system):
+- **Mighty**: +N coins on this ability
+- **Second Wind**: flip tails once more and keep any new heads (rare)
+- **Savage**: crits deal more (a crit already turns every coin heads)
+
+The target:
+- **Bane of <family>**: against one foe family (the AI picks the family)
+- **Executing**: against foes below half HP
+- **Opening Blow**: against foes at full HP
+- **Opportunist**: against a foe with any status; **Exploiting**: more for each different status on it
+- **Crushing**: against shielded or armored foes (high Physical defense)
+- **Giant-slayer**: against foes with more max HP than you
+- **Piercing**: ignores some of the target's defense
+
+You:
+- **Desperate**: when you are below half HP
+- **Fresh**: when you are above three quarters HP
+- **Haunted**: the more stress you have (ties to stress)
+- **Vengeful**: if you were hit since your last turn
+- **Vanguard**: when used from rank 1
+
+Timing:
+- **First Strike**: if you act before the target this round
+- **Momentum**: stacks with each use in a row, up to 3
+- **Bloodthirsty**: stacks with each kill this fight
+- **Focused**: if the target is the same as your last attack's
+
+Team:
+- **Coordinated**: if an ally hit this target this round
