@@ -17,7 +17,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 | **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, D-0086; reduced below) |
 | **CHA** | charisma | its battle and check skills | **increased quest gold** (designer), **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
-| **LUK** | luck | Fortune only (D-0094) | raises the heads chance of **every coin** (working 50% at 10, Â±0.5% per point) |
+| **LUK** | luck | none (D-0095) | raises the heads chance of **every coin** (working 50% at 10, Â±0.5% per point) |
 
 Starting stats are a little randomized, biased by **race**; a wolfkin leans DEX (D-0018).
 
@@ -33,7 +33,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (24)
+### Battle skills (25)
 
 **No skill is rare** (D-0093): rarity lives in stars. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
@@ -48,9 +48,10 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Shooting** | bows, crossbows, guns: back-rank sniper, long reach, aimed shots, volleys (D-0091) | DEX |
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
-| **Fury** | the berserker (Hellion): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR + CON |
+| **Berserk** | (was Fury, D-0095) the berserker (Hellion): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR + CON |
 | **Grit** | the survivor (Leper): self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
-| **Fortune** | the gambler with charmed coins: crit chance up, re-flip tails, double or nothing, weighted coins for allies, fated strikes, cancel a foe's crit (D-0094) | LUK |
+| **Precision** | raises the heads chance of coin flips, self or allies, and so crits (D-0095) | DEX |
+| **Warfare** | back (D-0095); scope open (draft: combined attacks with an ally, breaking foe shields, formation tricks) | STR + INT |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
