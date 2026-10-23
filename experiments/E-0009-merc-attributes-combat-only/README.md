@@ -2,10 +2,10 @@
 id: E-0009
 title: Merc attributes, combat only
 date: 2026-10-23
-status: running           # planned | running | done | abandoned
+status: done              # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: How do starting stats, races and talents roll, and what is each attribute worth in a fight (HP, speed, LUK)?
-verdict:                  # one line, filled in when done: the answer
+verdict: race +1 / −1 and mildly random starting stats (D-0106); CON, DEX and LUK scales left to the balance pass (designer)  # one line, filled in when done: the answer
 decisions: [D-0106]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
@@ -32,5 +32,7 @@ Claude's draft (2026-10-23), proposed to the designer:
 **Designer, 2026-10-23 (D-0106):** race only +1 / −1 so it doesn't force builds; starting stats mildly random. Now: three random coin moves within 8–12, then the race's +1 / −1; talents unweighted. 82% of starting stats at 9–11.
 
 ## Verdict
+
+Starting stats: 10 each, mild randomness, race +1 / −1 (D-0106); races don't force builds. **The exact CON (HP), DEX (speed) and LUK (heads) scales stay open for the balance pass** (designer, 2026-10-23: "for CON/DEX/LUK exact number just leave it open for balancer later to modify, dont lock those"); Claude's numbers above are placeholders. Two-attribute rounding stays Claude's working call (up).
 
 ## Next

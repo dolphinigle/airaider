@@ -13,11 +13,11 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 | stat | covers | skills | passive |
 |---|---|---|---|
 | **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (designer; reduced below), on all damage |
-| **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
+| **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order; scale left to the balance pass, designer; placeholder speed coins = DEX) |
 | **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, D-0084; reduced below) |
 | **CHA** | charisma | its battle and check skills | **increased quest gold** (designer), **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
-| **CON** | endurance, toughness | its battle and check skills | **max HP** |
-| **LUK** | luck | none (D-0095) | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
+| **CON** | endurance, toughness | its battle and check skills | **max HP** (scale left to the balance pass, designer; placeholder 30 at CON 10, ±3 a point) |
+| **LUK** | luck | none (D-0095) | raises the heads chance of **every coin** (50% at 10; size per point left to the balance pass, designer) |
 
 **Starting stats** (D-0106): every stat starts at 10, then mild randomness (working: three random coin moves, each stat kept within 8–12), then the **race gives +1 to one stat and −1 to another** (a wolfkin: DEX +1, INT −1), so races don't force builds. Talents are not weighted by race (Claude).
 
