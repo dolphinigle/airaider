@@ -19,7 +19,7 @@ The designer, 2026-10-23: "more importantly there should be a penalty for sendin
 Claude's proposal; the designer, 2026-10-23, took the stress approach and said "the beneath me stress is too low" (numbers raised, working):
 - **Skill XP follows the merc XP penalty** (2 below 50%, 3 below 20%, 4+ below 0%), so there is nothing to grind.
 - **"Beneath me" stress:** a merc on a quest 3 levels below them gains 25 stress at every node, 4 or more below 50 at every node. Two nodes at 4 below reach 100 stress: a Breakdown risk on an easy quest. (Claude first offered 10 and 20; designer: "the beneath me stress is too low.")
-- The quest preview shows it before departure ("Brann: beneath me, +20 stress a node").
+- The quest preview shows it before departure ("Brann: beneath me, +50 stress a node").
 - Later, with gold: such a merc also asks for higher pay.
 
 Rejected alternative: Darkest Dungeon's refusal (high-level heroes won't go). It removes the choice; stress keeps it a choice with a price.
