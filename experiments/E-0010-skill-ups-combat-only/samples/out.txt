@@ -1,0 +1,12 @@
+skill level after N quests (merc Lv in brackets, D-0105 curve)
+                1 (Lv2)   3 (Lv3)   5 (Lv4)   8 (Lv5)   11 (Lv6)  15 (Lv7)  20 (Lv8)  30 (Lv9)  50 (Lv10) 
+used   1★       1         2         3         3         4         4         5         6         8         
+used   2★       1         2         3         4         4         5         6         7         9         
+used   3★       2         3         3         4         5         5         6         8         9         
+used   4★       2         3         3         4         5         6         7         9         10        
+used   5★       2         3         4         4         5         7         8         9         10        
+unused 1★       1         2         2         3         3         3         4         4         6         
+unused 2★       1         2         2         3         3         4         4         5         7         
+unused 3★       1         2         3         3         4         4         5         6         7         
+unused 4★       1         2         3         3         4         4         5         6         8         
+unused 5★       1         2         3         4         4         5         6         7         8         
