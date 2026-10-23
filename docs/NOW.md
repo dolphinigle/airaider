@@ -25,7 +25,8 @@
 - **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
-  - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
+  - Start with 2 battle + 2 check skills; a battle skill at Lv 3, a check skill at Lv 5 (D-0102).
+  - **Merc level** (D-0102): XP from quest ends (fights and checks give small skill XP); curve in quests; soft cap past Lv 10, Lv 12 the practical max; 4+ levels below gives no XP; Level up at the base; a level grants attributes only. Overleveled mercs on easy quests: D-0103 (proposed, stress).
   - **Battle skills** (29: 8 weapon + 21 others; D-0099) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). 13 battle skills can be checked too (D-0100). Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
@@ -66,7 +67,7 @@
 
 0. **NEXT SESSION STARTS HERE: the plan to a playtest** (designer, 2026-10-23; replaces the four steps of 2026-10-22: "the abilities you created are decent enough that we can stop here"; balance-then-redo-abilities is dropped for now):
    1. **Done: baseline abilities for every battle skill (29)** (designer 2026-10-23: "all done, they look good"): E-0007 `baseline.mjs`, Artifact https://claude.ai/artifact/7Uvbcxg9cHofHe2H5TjjyW. Review rulings in E-0007 README; numbers wait for a balance pass.
-   2. **(next) Merc details:** level up, attributes, skill ups (cadence of new abilities, XP, stars). **Merc level up drafted and proposed (E-0008, waiting on the designer)** (designer, 2026-10-23: "you do (1) then propose to me. we are not caring about GOLD yet, we're doing the combat aspect of it first"): XP curve and cap, what a merc level grants in combat; no gold, no room caps yet. Then attributes, then skill ups. Show a sample merc's Lv 1→12 career.
+   2. **(next) Merc details:** level up, attributes, skill ups (cadence of new abilities, XP, stars). **Merc level up ruled (D-0102; E-0008); D-0103 proposed; next: answer how abilities are learned, then attributes, then skill ups** (designer, 2026-10-23: "you do (1) then propose to me. we are not caring about GOLD yet, we're doing the combat aspect of it first"): XP curve and cap, what a merc level grants in combat; no gold, no room caps yet. Then attributes, then skill ups. Show a sample merc's Lv 1→12 career.
    3. **Enemy design**, after Darkest Dungeon.
    4. **Playtest.**
    - Done (E-0007): conventions, effects list, mod catalog (mods are outside identities), key identities for all 29 skills with strong / weak effects, rank and role distributions, example builds; movers ruled (D-0101).

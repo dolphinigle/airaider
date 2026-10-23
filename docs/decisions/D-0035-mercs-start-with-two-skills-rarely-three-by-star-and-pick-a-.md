@@ -1,11 +1,11 @@
 ---
 id: D-0035
 title: Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7
-status: accepted
+status: superseded
 date: 2026-10-22
 decided-by: designer
 supersedes: [D-0020]
-superseded-by:
+superseded-by: D-0102
 evidence: []
 sources: []
 ---

@@ -29,7 +29,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 - Only the core skill counts in a test. The exact name colors the text ("Atlas swings his sword").
 - Skills have their **own XP** and level up separately from the merc (D-0012).
 
-**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none. Check nodes name a check skill or one of **13 checkable battle skills** (D-0100): Stealth, Doctor, Alchemy, Leadership, Animal Companion, Warfare, Performance, Carousing and all five magics. The weapon skills, Berserk, Executioner, Precision, Concentration, Defender, Survivor, Dirty Fighting and Retaliation are never checked. Quotas: 3 battle skills (2 at the start, 1 at Lv 7; working) and **3 check skills** (D-0083). Civilians have check skills only.
+**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none. Check nodes name a check skill or one of **13 checkable battle skills** (D-0100): Stealth, Doctor, Alchemy, Leadership, Animal Companion, Warfare, Performance, Carousing and all five magics. The weapon skills, Berserk, Executioner, Precision, Concentration, Defender, Survivor, Dirty Fighting and Retaliation are never checked. Quotas: 3 battle skills and **3 check skills** (D-0083): 2 + 2 at the start, a battle skill at Lv 3, a check skill at Lv 5 (D-0102). Civilians have check skills only.
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
@@ -95,11 +95,14 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attribut
 
 Two random draws over the six stats at recruitment. They may land on the same stat: one stat **++**, or two stats **+** each. Talents decide where stat growth lands.
 
-## Level and XP (D-0012, D-0018)
+## Level and XP (D-0012, D-0018, D-0102)
 
-- Every merc has a level, starting at **Lv 1**. **Lv 12** is around the endgame.
-- XP comes from quests. XP from quests **below the merc's level is severely penalized**, as in Path of Exile. Quests have levels.
-- At the XP threshold a **Level up** button appears; the player presses it. XP overflows into the next level.
+- Every merc has a level, starting at **Lv 1**. **Soft cap:** from Lv 10 each level costs much more XP, so **Lv 12** is the maximum in normal play (D-0102).
+- **Merc XP comes from quest ends** (D-0102); the curve counts quests done. Fights and skill checks give small **skill** XP only; quest ends give skill XP too.
+- XP from quests **below the merc's level is penalized**, as in Path of Exile; **4+ levels below gives none** (D-0102). Quests have levels.
+- At the XP threshold a **Level up** button appears; the player presses it **at the base, between quests** (D-0102). XP overflows into the next level.
+- Working (Claude, E-0008): 100 XP for a quest at the merc's level; quests to the next level 1, 1, 1, 2, 2, 2, 3, 3, 3, 6, 12 (Lv 10 after 18 quests, Lv 12 after 36); full XP down to 1 below, 2 below 50%, 3 below 20%.
+- Proposed (D-0103): a merc 3+ levels above the quest gains stress at every node, and skill XP follows the same penalty.
 
 ## Level up
 
@@ -110,7 +113,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875 each (others about +0.42), with five stats; slightly less on the others with six.
 
-**The player's choice is a skill** (D-0035): a merc **starts with two skills** (a third is rare, likelier at higher stars), and at **Lv 7** learns one more, **picking 1 of 3**, hidden until then. The options are rolled at recruitment (weighted by race and background, from skills the merc lacks).
+**The player's choice is a skill** (D-0102, replaces D-0035): a merc **starts with 2 battle skills and 2 check skills**, gains **a new battle skill at Lv 3** and **a new check skill at Lv 5**. Working (Claude): each is a pick of 1 of 3, hidden until then, rolled at recruitment (weighted by race and background, from skills the merc lacks).
 
 ## Stars (D-0067, D-0069)
 
@@ -161,5 +164,5 @@ Rolled when a merc is generated: race, rarity, starting stats, talents, starting
 
 ## Open
 
-- Numbers: starting stat spread per race, XP curve and penalty curve, skill XP thresholds.
+- Numbers: starting stat spread per race, skill XP thresholds (merc XP curve: working, D-0102).
 - Each trait's passive effect, parked by the designer: also whether race keeps its stat bias, how gender traits differ, and whether every trait is a trade-off (D-0036 to D-0040).

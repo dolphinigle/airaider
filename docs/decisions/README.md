@@ -41,7 +41,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0032](D-0032-a-reset-rerolls-only-the-level-up-seed-everything-else-stays.md) | A reset rerolls only the level-up seed; everything else stays | accepted | designer | 2026-10-21 |
 | [D-0033](D-0033-abilities-one-per-level-up-from-the-merc-s-skills-never-the-.md) | Abilities: one per level up from the merc's skills, never the same base twice, four equipped | superseded → D-0047 | designer | 2026-10-21 |
 | [D-0034](D-0034-tactic-parts-are-loot-no-gear-for-now.md) | Tactic parts are loot; no gear for now | accepted | designer | 2026-10-21 |
-| [D-0035](D-0035-mercs-start-with-two-skills-rarely-three-by-star-and-pick-a-.md) | Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7 | accepted | designer | 2026-10-22 |
+| [D-0035](D-0035-mercs-start-with-two-skills-rarely-three-by-star-and-pick-a-.md) | Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7 | superseded → D-0102 | designer | 2026-10-22 |
 | [D-0036](D-0036-passives-come-from-personality-traits.md) | Passives come from personality traits | accepted | designer | 2026-10-22 |
 | [D-0037](D-0037-a-star-up-item-sets-a-merc-to-a-fixed-star-so-5-stars-stay-v.md) | A star-up item sets a merc to a fixed star, so 5 stars stay valuable | accepted | designer | 2026-10-21 |
 | [D-0038](D-0038-race-gives-a-passive-too-a-trade-off-like-the-trait-passives.md) | Race gives a passive too, a trade-off like the trait passives | accepted | designer | 2026-10-21 |
@@ -108,4 +108,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0099](D-0099-skill-roster-round-six-carousing-roguery-renamed-thievery.md) | Skill roster round six: Carousing, Roguery renamed Thievery | accepted | designer | 2026-10-22 |
 | [D-0100](D-0100-which-battle-skills-can-be-checked.md) | Which battle skills can be checked | accepted | designer | 2026-10-22 |
 | [D-0101](D-0101-rank-movement-warfare-moves-allies-five-skills-move-foes.md) | Rank movement: Warfare moves allies, five skills move foes | accepted | designer | 2026-10-23 |
+| [D-0102](D-0102-merc-xp-comes-from-quest-ends-with-a-soft-cap-past-lv-10-mer.md) | Merc XP comes from quest ends with a soft cap past Lv 10; mercs start with 2 battle and 2 check skills, gain a battle skill at Lv 3 and a check skill at Lv 5 | accepted | designer | 2026-10-23 |
+| [D-0103](D-0103-mercs-sent-on-quests-far-below-their-level-gain-stress-and-e.md) | Mercs sent on quests far below their level gain stress and earn no XP | proposed | designer | 2026-10-23 |
 <!-- index:end -->

@@ -6,7 +6,7 @@ status: running           # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: What XP curve, cap and combat gains should a merc level have, and how does a Lv 1 → 12 career feel?
 verdict:                  # one line, filled in when done: the answer
-decisions: []             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0102, D-0103]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -27,6 +27,8 @@ Claude's draft (2026-10-23), proposed to the designer:
 - **Penalty:** full XP on quests down to 1 level below the merc; 2 below 50%, 3 below 20%, 4+ below 5%. No bonus for higher quests.
 - **Level up** at the base, between quests.
 - **Per level in a fight:** 3 coins. The main attack stat gains about 0.85 a level; a 100% hit from merc levels alone grows about 6% a level (1.95× by Lv 12), about 10% a level with skill levels (2.9× by Lv 12). HP 33 → 61.
+
+**Designer, 2026-10-23, reshaped it (D-0102):** XP from quest ends, curve in quests, soft cap past Lv 10, 4+ below gives 0%, start 2 battle + 2 check skills, battle skill at Lv 3, check skill at Lv 5; asked for a penalty on overleveled mercs (D-0103, proposed: stress). The sim now runs the quest curve 1, 1, 1, 2, 2, 2, 3, 3, 3, 6, 12 (Lv 12 after 36 quests).
 
 Samples: `samples/career-seed7.txt`, `samples/stats.txt`.
 

@@ -6,11 +6,12 @@
 import { all } from '../E-0007-ability-brainstorm-per-battle-skill/baseline.mjs';
 const rng = seed => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 
-// fights won at the merc's level to reach the next level (Lv 1→2 is index 0); XP = 100 a fight, 200 a boss
-export const FIGHTS = [2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16];
-export const XP_TO_NEXT = FIGHTS.map(f => f * 100);
-// quest size by merc level, for the sample (D-0052: 1–2 fights early, ~4 fights + a boss late)
-const questFights = lv => lv <= 2 ? 2 : lv <= 4 ? 3 : lv <= 7 ? 4 : 5;
+// merc XP comes from quest ends (designer): 100 for a quest at the merc's level. Quests at level to the next level (Lv 1→2 is index 0);
+// soft cap (designer): from Lv 10 each level costs double, so Lv 12 is the practical maximum (Lv 13 would take 24 more quests)
+export const QUESTS = [1, 1, 1, 2, 2, 2, 3, 3, 3, 6, 12];
+export const XP_TO_NEXT = QUESTS.map(q => q * 100);
+// XP from a quest below the merc's level (designer: 4+ below gives nothing)
+export const penalty = below => below <= 1 ? 1 : below === 2 ? 0.5 : below === 3 ? 0.2 : 0;
 
 const STATS = ['STR', 'DEX', 'INT', 'CHA', 'CON', 'LUK'];
 const SK = Object.fromEntries(all().map(k => [k.name, k]));
@@ -36,19 +37,19 @@ const hit = (m, skill) => coins(m, skill) * heads(m) * (1 + (m.st.STR - 10) / 10
 
 export function career(seed, opt = {}) {
   const r = rng(seed);
-  const m = { name: 'Brann', race: 'wolfkin', talents: opt.talents || ['STR', 'CON'], skills: ['Two-handed', 'Beast Blood'], lv7: 'Survivor',
+  const m = { name: 'Brann', race: 'wolfkin', talents: opt.talents || ['STR', 'CON'], skills: ['Two-handed', 'Beast Blood'], checks: ['Survival', 'Perception'], lv3: 'Survivor', lv5: 'Intimidation',
     st: { STR: 11, DEX: 11, INT: 9, CHA: 10, CON: 11, LUK: 10 }, sk: {}, known: [] };
   const rows = [], gain = (skill, lv) => { m.sk[skill] = Math.min(10, (m.sk[skill] || 0) + 1); return [1, 3, 5, 7, 9].includes(m.sk[skill]) ? newAbility(r, m, skill) : null; };
   const lvl1 = m.skills.map(s => gain(s)).filter(Boolean);
-  let fights = 0, quests = 0;
-  rows.push({ lv: 1, fights, quests, coins: [], abil: lvl1, ...snap(m) });
+  let quests = 0;
+  rows.push({ lv: 1, quests, gained: '', coins: [], abil: lvl1, ...snap(m) });
   for (let lv = 2; lv <= 12; lv++) {
-    const need = FIGHTS[lv - 2]; let done = 0; while (done < need) { const q = questFights(lv - 1); done += q; quests++; }
-    fights += need;                                      // overflow ignored in the sample
-    const c = levelUp(r, m), abil = [];
-    if (lv === 7) m.skills.push(m.lv7);
+    quests += QUESTS[lv - 2];
+    const c = levelUp(r, m), abil = []; let gained = '';
+    if (lv === 3) { m.skills.push(m.lv3); gained = m.lv3; }           // designer: a new battle skill at Lv 3
+    if (lv === 5) { m.checks.push(m.lv5); gained = m.lv5; }           // and a new check skill at Lv 5
     for (const s of m.skills) { const a = gain(s); if (a) abil.push(a); }
-    rows.push({ lv, fights, quests, coins: c, abil, ...snap(m) });
+    rows.push({ lv, quests, gained, coins: c, abil, ...snap(m) });
   }
   return { m, rows };
 }
@@ -64,7 +65,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     acc.forEach((x, j) => console.log(`${String(j + 1).padEnd(3)} ${(x.STR / N).toFixed(1).padEnd(5)} ${(x.CON / N).toFixed(1).padEnd(5)} ${(x.DEX / N).toFixed(1).padEnd(5)} ${(x.hp / N).toFixed(0).padEnd(5)} ${(x.dmg / N / d1 * 100).toFixed(0)}%`));
   } else {
     const { rows } = career(+a || 7), d1 = rows[0].dmg;
-    console.log('lv  fights quests | STR DEX INT CHA CON LUK | coins this level | HP  speed | Two-handed coins  hit | new abilities');
-    for (const x of rows) console.log(`${String(x.lv).padEnd(3)} ${String(x.fights).padEnd(6)} ${String(x.quests).padEnd(6)} | ${STATS.map(s => String(x.st[s]).padEnd(3)).join(' ')} | ${(x.coins.join(' ') || '—').padEnd(16)} | ${String(x.hp).padEnd(3)} ${String(x.spd).padEnd(5)} | ${x.atk.toFixed(0).padEnd(16)} ${(x.dmg / d1 * 100).toFixed(0)}% | ${x.abil.map(b => `${b.name} (${b.star}★)`).join(', ')}`);
+    console.log('lv  quests | STR DEX INT CHA CON LUK | coins this level | HP  speed | Two-handed coins  hit | new skill | new abilities');
+    for (const x of rows) console.log(`${String(x.lv).padEnd(3)} ${String(x.quests).padEnd(6)} | ${STATS.map(s => String(x.st[s]).padEnd(3)).join(' ')} | ${(x.coins.join(' ') || '—').padEnd(16)} | ${String(x.hp).padEnd(3)} ${String(x.spd).padEnd(5)} | ${x.atk.toFixed(0).padEnd(16)} ${(x.dmg / d1 * 100).toFixed(0)}% | ${(x.gained || '').padEnd(12)} | ${x.abil.map(b => `${b.name} (${b.star}★)`).join(', ')}`);
   }
 }
