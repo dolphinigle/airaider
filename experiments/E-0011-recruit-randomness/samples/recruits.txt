@@ -1,21 +1,21 @@
 eastern human woman, merc 1½★ · STR 10 DEX 12 INT 10 CHA 11 CON 7 LUK 10 · talents DEX+ CHA+ · HP 21
-  traits: woman (flavor), human, Gruff 1½★, nimble 1★, Cold 1★
-  Shooting 1★: Slowing Shot · Bleeding Shot · Aimed Shot · Close Shot · Back-Rank Shot ◆
-  Defender 1★: Shield and Guard Ally · Shield Ally · Taunt · Shield Self and Taunt · Guard Ally
-  checks: Engineering 1½★, Intimidation 1★
-  Lv 3 offer: Performance 1½★ / Dark 1★ / Alchemy 1★   ·   Lv 5 offer: Streetwise 2★ / Survival 1½★ / Cooking 1★
+  traits: woman (flavor), human, Cheerful 1★, muscular 1½★
+  Polearm 1½★: Advancing Lunge ◆ · Bleeding Thrust · Advancing Back-Rank Thrust · Pushing Strike · Thrust
+  Leadership 1½★: Brace Ally · Embolden Self and Ally · Calm Ally · Embolden Ally ◆ · Embolden All Allies
+  checks: Athletics 1½★, Perception 2½★
+  Lv 3 offer: Executioner 1★ / Carousing 1½★ / Frost 2★   ·   Lv 5 offer: Survival 1½★ / Engineering 2★ / Lore 1½★
 
-western human man, merc 3★ · STR 10 DEX 11 INT 9 CHA 11 CON 10 LUK 13 · talents DEX+ STR+ · HP 30
-  traits: man (flavor), human, Cheerful 2★, muscular 3½★
-  Lightning 3½★: Arcing Bolt · Spread Shock ◆ · Shock All Foes ◆ · Shocking Spark ◆ · Chain Lightning
-  Shooting 2½★: Back-Rank Shot · Aimed Shot ◆ · Bleeding Shot · Slowing Shot · Ricochet Shot
-  checks: Smithing 3★, Cooking 2½★
-  Lv 3 offer: Dirty Fighting 3★ / Holy 3★ / Frost 2½★   ·   Lv 5 offer: Thievery 3★ / Intimidation 3★ / Streetwise 2★
+western human woman, merc 3★ · STR 10 DEX 11 INT 9 CHA 11 CON 10 LUK 13 · talents DEX+ STR+ · HP 30
+  traits: woman (flavor), human, Greedy 3★, nimble 3★
+  Single Weapon 2★: Strike and Shield · Riposte Stance ◆ · Rank-Adapting Strike · Reaching Thrust · Strike and Fall Back ◆
+  Warfare 2½★: Order Flank · Order Fall Back · Swap Allies · Move Ally ◆ · Order Armor Break
+  checks: Streetwise 3★, Athletics 3★
+  Lv 3 offer: Frost 3½★ / Fire 3★ / Dark 2½★   ·   Lv 5 offer: Intimidation 3★ / Survival 3★ / Smithing 3★
 
-elf man, merc 2½★ · STR 10 DEX 13 INT 13 CHA 11 CON 11 LUK 12 · talents INT+ STR+ · HP 33
-  traits: man (flavor), elf (INT +1, STR −1), Greedy 2★, scarred 2★
-  Frost 2½★: Frost Strike and Shield ◆ · Ice Shield · Chilling Ice Shield ◆ · Strong Chill ◆ · Chilling Lance
-  Fire 2½★: Cauterize Wounds ◆ · Close Fire Sweep · Close Fire Spray · Strong Burn · Back-Rank Fire Lash
-  checks: Smithing 3★, Persuasion 3★
-  Lv 3 offer: Doctor 1½★ / Animal Companion 3★ / Dark 3★   ·   Lv 5 offer: Cooking 2½★ / Survival 2½★ / Intimidation 1½★
+elf woman, merc 2½★ · STR 10 DEX 13 INT 13 CHA 11 CON 11 LUK 12 · talents INT+ STR+ · HP 33
+  traits: woman (flavor), elf (INT +1, STR −1), Stubborn 2½★, tall 2½★
+  Shooting 2½★: Slowing Shot · Close Shot · Bleeding Shot ◆ · Back-Rank Shot · Ricochet Shot ◆
+  Leadership 2½★: Embolden Self and Ally · Brace Ally · Order Ally to Act Again ◆ · Calm Ally · Embolden Ally
+  checks: Persuasion 2½★, Smithing 1½★
+  Lv 3 offer: Stealth 2★ / Doctor 2★ / Dark 2★   ·   Lv 5 offer: Cooking 2½★ / Thievery 2½★ / Lore 2½★
 

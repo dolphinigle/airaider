@@ -115,7 +115,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875 each (others about +0.42), with five stats; slightly less on the others with six.
 
-**Skills are dealt by the engine and picked by the AI** at recruitment (D-0114), no talent lean; **one starting battle skill is always a weapon or magic skill**. **The player's choice is a skill** (D-0102, replaces D-0035): a merc **starts with 2 battle skills and 2 check skills**, gains **a new battle skill at Lv 3** and **a new check skill at Lv 5**. Each is a **pick of 1 of 3** (D-0104), hidden until then, rolled at recruitment (weighted by race and background, from skills the merc lacks).
+**Skills are dealt by the engine and picked by the AI** at recruitment (D-0114), no talent lean, **in one ask** (designer): from a battle deal (working: 8, at least 3 weapon or magic) it picks the 2 starting skills and the 3 the Lv 3 offer will show, and from a check deal (8) the 2 starting and the 3 for Lv 5; **one starting battle skill is always a weapon or magic skill**. **The player's choice is a skill** (D-0102, replaces D-0035): a merc **starts with 2 battle skills and 2 check skills**, gains **a new battle skill at Lv 3** and **a new check skill at Lv 5**. Each is a **pick of 1 of 3** (D-0104), hidden until then, rolled at recruitment (weighted by race and background, from skills the merc lacks).
 
 ## Stars (D-0067, D-0069)
 

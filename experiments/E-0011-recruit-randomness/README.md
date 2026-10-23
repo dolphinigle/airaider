@@ -37,4 +37,6 @@ Mid-session ruling (D-0110): race and gender are traits; the race trait carries 
 
 Designer rulings: one starting battle skill is always weapon or magic; skills are engine-dealt and AI-picked with no talent lean (D-0114); race and gender are traits, the race trait carries the stat shift, humans and gender no effect (D-0110); race traits have no star (D-0111); starting attributes 5–15 on a bell curve (D-0113). Skill-star spread and race odds left to Claude. Generic first attacks drop from 29% to 0%.
 
+**One AI ask** (designer, 2026-10-23: "ai should decide all of them at start. so ai ask to pick: starting two skills, three offered in mid, same with non battle"): at recruitment the AI gets one battle deal (8 legal skills, at least 3 weapon or magic) and picks the 2 starting skills and the 3 the Lv 3 offer will show; and one check deal (8) for the 2 starting and the 3 for Lv 5. Replaces D-0114's per-slot deals (Claude's working numbers).
+
 ## Next

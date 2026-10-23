@@ -42,12 +42,14 @@ export function makeRecruit(seed, progress = 0) {
   const r = rng(seed), race = choose(r, Object.keys(RACE_W), x => RACE_W[x]);
   const st = STARS[pick(r, PULL_EARLY.map((e, i) => e * (1 - progress) + PULL_LATE[i] * progress))];
   const base = rollStats(r, race), m = { race, people: race === 'human' ? choose(r, PEOPLES) : null, star: st, stats: base.st, talents: base.talents, hp: base.hp };
-  // starting battle skills: one weapon or magic skill (D-0114), then one more; deals of 4, the AI picks one from each
-  const wm = aiPick(r, deal(r, legal(m, []).filter(k => WEAPON.has(k.name) || MAGIC.has(k.name)), 4), 1);
-  const battle = [...wm, ...aiPick(r, deal(r, legal(m, wm), 4), 1)];
-  const offer3 = aiPick(r, deal(r, legal(m, battle), 6), 3);                       // Lv 3 offer: deal 6, the AI picks the 3 the player will see
-  const checks = Object.keys(CHECK), ck = aiPick(r, deal(r, checks, 4), 2);
-  const offer5 = aiPick(r, deal(r, checks.filter(c => !ck.includes(c)), 6), 3);
+  // one AI ask at recruitment (designer): from one battle deal of 8 (at least 3 weapon or magic) it picks the 2 starting skills
+  // (one weapon or magic, D-0114) and the 3 the Lv 3 offer will show; from one check deal of 8, the 2 starting and the 3 for Lv 5
+  const L = legal(m, []), wmPool = L.filter(k => WEAPON.has(k.name) || MAGIC.has(k.name));
+  const bDeal = deal(r, wmPool, 3); bDeal.push(...deal(r, legal(m, bDeal).filter(k => !bDeal.includes(k)), 5));
+  const wm = aiPick(r, bDeal.filter(k => WEAPON.has(k.name) || MAGIC.has(k.name)), 1);
+  const second = aiPick(r, legal(m, wm).filter(k => bDeal.includes(k)), 1), battle = [...wm, ...second];
+  const offer3 = aiPick(r, legal(m, battle).filter(k => bDeal.includes(k)), 3);
+  const checks = Object.keys(CHECK), cDeal = deal(r, checks, 8), ck = aiPick(r, cDeal, 2), offer5 = aiPick(r, cDeal.filter(c => !ck.includes(c)), 3);
   const sk = k => { const s = near(r, st); return { name: k.name ?? k, star: s, ...(k.abilities ? { abil: abilities(r, k, s) } : {}) }; };
   Object.assign(m, { battle: battle.map(sk), checks: ck.map(sk), lv3: offer3.map(sk), lv5: offer5.map(sk) });
   const sh = RACES[race];
