@@ -1,13 +1,13 @@
 lv  quests | STR DEX INT CHA CON LUK | coins this level | HP  speed | Two-handed coins  hit | new skill | new abilities
 1   0      | 11  11  9   10  11  10  | —                | 33  11    | 12               100% |              | Heavy Strike (1★), Strike the Marked Prey (2★)
 2   1      | 12  11  9   11  12  10  | STR CON CHA      | 36  11    | 14               118% |              | 
-3   2      | 13  12  9   11  13  10  | CON STR DEX      | 39  12    | 16               136% | Survivor     | Three-Foe Cleave (4★), Pounce (1★), Regenerate (1★)
-4   3      | 14  13  9   11  14  10  | CON STR DEX      | 42  13    | 18               154% |              | 
-5   5      | 15  13  9   12  15  10  | STR CON CHA      | 45  13    | 20               173% | Intimidation | Reckless Strike (2★), Slowing Bite (2★), Shrug Off and Heal (4★)
-6   7      | 16  14  9   12  16  10  | CON STR DEX      | 48  14    | 22               192% |              | 
-7   9      | 17  15  9   12  17  10  | STR CON DEX      | 51  15    | 24               212% |              | Cleave (1★), Mark Prey (1★), Adrenaline Rush (2★)
-8   12     | 18  16  9   12  18  10  | STR CON DEX      | 54  16    | 26               232% |              | 
-9   15     | 19  17  9   12  19  10  | CON STR DEX      | 57  17    | 28               252% |              | Stunning Blow (2★), Beast Healing (2★), Regenerate and Brace (2★)
-10  18     | 20  17  9   12  20  11  | STR CON LUK      | 60  17    | 30               275% |              | 
-11  24     | 20  17  10  12  21  12  | CON INT LUK      | 63  17    | 30               278% |              | Desperate Heal (3★)
-12  36     | 21  17  11  12  22  12  | STR INT CON      | 66  17    | 31               290% |              | 
+3   3      | 13  12  9   11  13  10  | CON STR DEX      | 39  12    | 16               136% | Survivor     | Three-Foe Cleave (4★), Pounce (1★), Regenerate (1★)
+4   5      | 14  13  9   11  14  10  | CON STR DEX      | 42  13    | 18               154% |              | 
+5   8      | 15  13  9   12  15  10  | STR CON CHA      | 45  13    | 20               173% | Intimidation | Reckless Strike (2★), Slowing Bite (2★), Shrug Off and Heal (4★)
+6   11     | 16  14  9   12  16  10  | CON STR DEX      | 48  14    | 22               192% |              | 
+7   15     | 17  15  9   12  17  10  | STR CON DEX      | 51  15    | 24               212% |              | Cleave (1★), Mark Prey (1★), Adrenaline Rush (2★)
+8   20     | 18  16  9   12  18  10  | STR CON DEX      | 54  16    | 26               232% |              | 
+9   30     | 19  17  9   12  19  10  | CON STR DEX      | 57  17    | 28               252% |              | Stunning Blow (2★), Beast Healing (2★), Regenerate and Brace (2★)
+10  50     | 20  17  9   12  20  11  | STR CON LUK      | 60  17    | 30               275% |              | 
+11  150    | 20  17  10  12  21  12  | CON INT LUK      | 63  17    | 30               278% |              | Desperate Heal (3★)
+12  1150   | 21  17  11  12  22  12  | STR INT CON      | 66  17    | 31               290% |              | 

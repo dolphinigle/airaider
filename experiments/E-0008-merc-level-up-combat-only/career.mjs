@@ -7,8 +7,8 @@ import { all } from '../E-0007-ability-brainstorm-per-battle-skill/baseline.mjs'
 const rng = seed => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 
 // merc XP comes from quest ends (designer): 100 for a quest at the merc's level. Quests at level to the next level (Lv 1→2 is index 0);
-// soft cap (designer): from Lv 10 each level costs double, so Lv 12 is the practical maximum (Lv 13 would take 24 more quests)
-export const QUESTS = [1, 1, 1, 2, 2, 2, 3, 3, 3, 6, 12];
+// soft cap; curve from the designer (2026-10-23, "maybe"): the last entry is Lv 12 → 13
+export const QUESTS = [1, 2, 2, 3, 3, 4, 5, 10, 20, 100, 1000, 10000];
 export const XP_TO_NEXT = QUESTS.map(q => q * 100);
 // XP from a quest below the merc's level (designer: 4+ below gives nothing)
 export const penalty = below => below <= 1 ? 1 : below === 2 ? 0.5 : below === 3 ? 0.2 : 0;

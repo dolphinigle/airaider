@@ -30,6 +30,8 @@ Claude's draft (2026-10-23), proposed to the designer:
 
 **Designer, 2026-10-23, reshaped it (D-0102):** XP from quest ends, curve in quests, soft cap past Lv 10, 4+ below gives 0%, start 2 battle + 2 check skills, battle skill at Lv 3, check skill at Lv 5; asked for a penalty on overleveled mercs (D-0103, proposed: stress). The sim now runs the quest curve 1, 1, 1, 2, 2, 2, 3, 3, 3, 6, 12 (Lv 12 after 36 quests).
 
+**Designer, 2026-10-23, replaced the curve:** "maybe 1 2 2 3 3 4 5 10 20 100 1000 10000?" (quests at level to the next level). Lv 10 after 50 quests, Lv 11 after 150, Lv 12 after 1150.
+
 Samples: `samples/career-seed7.txt`, `samples/stats.txt`.
 
 ## Verdict
