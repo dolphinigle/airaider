@@ -121,7 +121,7 @@ Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875
 
 - **Every skill has a star**, 1★–5★ in half steps (talent), battle and check skills alike (D-0069). **The star sets the skill's XP gain** (how fast it levels). A battle skill's star also sets its abilities' modifier odds: 0–4 modifiers, more at higher stars (four on about 0.1% of a 5★ skill's abilities). Working odds: E-0004 `halfstar.mjs`, now per skill.
 - **A merc's star** (1★–5★, half steps, rolled at recruitment) makes their skills likelier to roll high stars. Higher stars get more common as the game goes on.
-- **Traits have stars too**; a trait's passive scales a little with its star (D-0068; working: 5★ = 1.5× the 1★ effect, upside only). Intent (designer): "just to make rare chase feels better not to force players to have to have them": a 1★ trait is fully playable.
+- **Traits have stars too**, except race (and gender) traits (D-0111); a trait's passive scales a little with its star (D-0068; working: 5★ = 1.5× the 1★ effect, upside only). Intent (designer): "just to make rare chase feels better not to force players to have to have them": a 1★ trait is fully playable.
 
 ## Abilities (D-0031, D-0069)
 

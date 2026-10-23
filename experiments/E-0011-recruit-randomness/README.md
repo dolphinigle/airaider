@@ -6,7 +6,7 @@ status: running           # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: What is rolled when a merc is made, with what odds, and do the recruits read as varied but fair?
 verdict:                  # one line, filled in when done: the answer
-decisions: [D-0110]       # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0110, D-0111]       # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -27,7 +27,7 @@ Claude's draft (2026-10-23), proposed to the designer. Rolled at recruitment, in
 4. **Skills:** 2 battle + 2 check, then the Lv 3 offer (3 battle) and the Lv 5 offer (3 check). Skills that use a talented attribute are twice as likely (a soft lean). At most one weapon skill; blood skills only for their races, at most one.
 5. **Skill stars:** around the merc's star: same 45%, ±½★ 20% each, ±1★ 7.5% each.
 6. **Abilities:** five per battle skill, including the Lv 3 offers (D-0104); three bases dealt per slot, rarer bases likelier at higher skill stars; mod count by skill star (E-0004 odds).
-7. **Traits:** gender (flavor), race (its +1 / −1, D-0110), one personality (a second 25%), one body; each with a star around the merc's star.
+7. **Traits:** gender (flavor), race (its +1 / −1, D-0110), one personality (a second 25%), one body; personality and body each with a star around the merc's star (race and gender have none, D-0111).
 
 Numbers: early game 74% of starting abilities have no mod, 22% one, 3% two; late game 62 / 31 / 6%. 29% of recruits have no weapon or magic skill and open with a generic attack (D-0050).
 

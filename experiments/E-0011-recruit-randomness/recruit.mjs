@@ -52,7 +52,7 @@ export function makeRecruit(seed, progress = 0) {
   const sk = k => { const s = near(r, st); return { name: k.name ?? k, star: s, ...(k.abilities ? { abil: abilities(r, k, s) } : {}) }; };
   Object.assign(m, { battle: battle.map(sk), checks: ck.map(sk), lv3: offer3.map(sk), lv5: offer5.map(sk) });
   const sh = RACES[race];
-  m.traits = [{ kind: 'gender', name: choose(r, ['man', 'woman']) }, { kind: 'race', name: race + (sh ? ` (${sh[0]} +1, ${sh[1]} −1)` : '') }, { kind: 'personality', name: choose(r, PERSONALITY) }, { kind: 'body', name: choose(r, BODY) }].map(t => ({ ...t, star: near(r, st) }));
+  m.traits = [{ kind: 'gender', name: choose(r, ['man', 'woman']) }, { kind: 'race', name: race + (sh ? ` (${sh[0]} +1, ${sh[1]} −1)` : '') }, { kind: 'personality', name: choose(r, PERSONALITY) }, { kind: 'body', name: choose(r, BODY) }].map(t => t.kind === 'gender' || t.kind === 'race' ? t : { ...t, star: near(r, st) });   // D-0111: race (and gender) have no star
   if (r() < 0.25) m.traits.push({ kind: 'personality', name: choose(r, PERSONALITY.filter(p => p !== m.traits[2].name)), star: near(r, st) });
   m.generic = !m.battle.some(k => WEAPON.has(k.name) || MAGIC.has(k.name));       // D-0050: generic 0-cd attack as the first ability
   return m;
@@ -60,7 +60,7 @@ export function makeRecruit(seed, progress = 0) {
 const S = st => `${Math.floor(st)}${st % 1 ? '½' : ''}★`;
 const show = m => {
   const L = [`${m.people ? m.people + ' ' : ''}${m.race} ${m.traits[0].name}, merc ${S(m.star)} · ${Object.entries(m.stats).map(([k, v]) => `${k} ${v}`).join(' ')} · talents ${m.talents[0] === m.talents[1] ? m.talents[0] + '++' : m.talents.join('+ ') + '+'} · HP ${m.hp}`,
-    `  traits: ${m.traits.map(t => t.kind === 'gender' ? t.name + ' (flavor)' : `${t.name} ${S(t.star)}`).join(', ')}${m.generic ? '  · first ability: a generic attack (no weapon or magic skill)' : ''}`];
+    `  traits: ${m.traits.map(t => t.kind === 'gender' ? t.name + ' (flavor)' : t.kind === 'race' ? t.name : `${t.name} ${S(t.star)}`).join(', ')}${m.generic ? '  · first ability: a generic attack (no weapon or magic skill)' : ''}`];
   for (const k of m.battle) L.push(`  ${k.name} ${S(k.star)}: ` + k.abil.map(a => `${a.name}${a.mods ? ' ' + '◆'.repeat(a.mods) : ''}`).join(' · '));
   L.push(`  checks: ${m.checks.map(k => `${k.name} ${S(k.star)}`).join(', ')}`);
   L.push(`  Lv 3 offer: ${m.lv3.map(k => `${k.name} ${S(k.star)}`).join(' / ')}   ·   Lv 5 offer: ${m.lv5.map(k => `${k.name} ${S(k.star)}`).join(' / ')}`);

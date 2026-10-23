@@ -117,4 +117,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0108](D-0108-races-add-orc-catfolk-shifts-cha.md) | "Races: wolfkin, catfolk, elf, dragonkin, orc and human, with four human peoples" | accepted | designer | 2026-10-23 |
 | [D-0109](D-0109-quest-and-fight-skill-xp-go-to-every-skill-check-xp-only-to-.md) | Quest and fight skill XP go to every skill; check XP only to the checked skill; elf is STR minus | accepted | designer | 2026-10-23 |
 | [D-0110](D-0110-race-and-gender-are-traits-a-race-trait-carries-its-stat-shi.md) | Race and gender are traits; a race trait carries its stat shift; humans and gender have no effect | accepted | designer | 2026-10-23 |
+| [D-0111](D-0111-race-traits-have-no-star.md) | Race traits have no star | accepted | designer | 2026-10-23 |
 <!-- index:end -->
