@@ -21,6 +21,8 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 
 **Starting stats** (D-0106): every stat starts at 10, then mild randomness (working: three random coin moves, each stat kept within 8–12), then the **race gives +1 to one stat and −1 to another** (a wolfkin: DEX +1, INT −1), so races don't force builds. Talents are not weighted by race (Claude).
 
+**Races** (D-0107): **wolfkin** (DEX + / INT −), **catfolk** (LUK + / CON −), **elf** (INT + / CON −), **dragonkin** (CON + / DEX −), **human** (a random + / −). Humans come in four peoples, flavor only (looks, names, writing): **northerner** (Scandinavian), **western** (European), **eastern** (Japanese), **southern** (African). Stat shifts: Claude's working. Exclusive skills: Beast Blood (wolfkin, catfolk), Ancient Blood (dragonkin), both also for shapeshifters.
+
 ## Skills (D-0021, D-0022)
 
 A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) ●●●".

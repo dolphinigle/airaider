@@ -1,19 +1,13 @@
 human      STR 11  DEX 10  INT 11  CHA 10  CON 8   LUK 10  talents DEX+ CHA+  HP 24
 wolfkin    STR 11  DEX 10  INT 10  CHA 10  CON 8   LUK 11  talents DEX+ CON+  HP 24
-catfolk    STR 11  DEX 10  INT 10  CHA 8   CON 11  LUK 10  talents LUK+ DEX+  HP 33
-bearkin    STR 10  DEX 9   INT 10  CHA 10  CON 12  LUK 9   talents CON+ STR+  HP 36
-elf        STR 8   DEX 10  INT 13  CHA 11  CON 9   LUK 9   talents CHA+ LUK+  HP 27
-dwarf      STR 10  DEX 10  INT 10  CHA 9   CON 10  LUK 11  talents CON++  HP 30
-dragonkin  STR 10  DEX 9   INT 9   CHA 10  CON 11  LUK 11  talents CON+ STR+  HP 33
-giantkin   STR 10  DEX 11  INT 10  CHA 10  CON 10  LUK 9   talents INT+ CHA+  HP 30
+catfolk    STR 11  DEX 9   INT 10  CHA 8   CON 11  LUK 11  talents LUK+ DEX+  HP 33
+elf        STR 9   DEX 10  INT 11  CHA 10  CON 11  LUK 9   talents CON+ STR+  HP 33
+dragonkin  STR 8   DEX 9   INT 12  CHA 11  CON 11  LUK 9   talents CHA+ LUK+  HP 33
 human      STR 9   DEX 10  INT 12  CHA 11  CON 10  LUK 8   talents INT+ CON+  HP 30
 wolfkin    STR 12  DEX 11  INT 8   CHA 9   CON 9   LUK 11  talents CON++  HP 27
-catfolk    STR 11  DEX 9   INT 10  CHA 11  CON 8   LUK 11  talents DEX+ STR+  HP 24
-bearkin    STR 12  DEX 9   INT 11  CHA 10  CON 10  LUK 8   talents INT+ STR+  HP 30
-elf        STR 9   DEX 9   INT 10  CHA 12  CON 9   LUK 11  talents CON+ STR+  HP 27
-dwarf      STR 11  DEX 10  INT 10  CHA 9   CON 11  LUK 9   talents INT++  HP 33
-dragonkin  STR 9   DEX 8   INT 9   CHA 11  CON 13  LUK 10  talents INT+ LUK+  HP 39
-giantkin   STR 10  DEX 10  INT 9   CHA 11  CON 10  LUK 10  talents INT+ LUK+  HP 30
+catfolk    STR 11  DEX 8   INT 10  CHA 11  CON 8   LUK 12  talents DEX+ STR+  HP 24
+elf        STR 11  DEX 10  INT 12  CHA 10  CON 9   LUK 8   talents INT+ STR+  HP 27
+dragonkin  STR 9   DEX 8   INT 9   CHA 12  CON 11  LUK 11  talents CON+ STR+  HP 33
 starting stat values (all stats, human): 7: 1%  8: 8%  9: 23%  10: 35%  11: 24%  12: 8%  13: 1%  · highest − lowest stat, average 3.1
 chance the row DEX acts before the column DEX (ties split)
       8     10    12    15    18    21    
