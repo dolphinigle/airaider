@@ -115,4 +115,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0106](D-0106-race-shifts-one-stat-up-1-and-another-down-1-starting-stats-.md) | Race shifts one stat up 1 and another down 1; starting stats get mild randomness | accepted | designer | 2026-10-23 |
 | [D-0107](D-0107-races-wolfkin-catfolk-elf-dragonkin-and-human-with-four-huma.md) | "Races: wolfkin, catfolk, elf, dragonkin and human, with four human peoples" | superseded → D-0108 | designer | 2026-10-23 |
 | [D-0108](D-0108-races-add-orc-catfolk-shifts-cha.md) | "Races: wolfkin, catfolk, elf, dragonkin, orc and human, with four human peoples" | accepted | designer | 2026-10-23 |
+| [D-0109](D-0109-quest-and-fight-skill-xp-go-to-every-skill-check-xp-only-to-.md) | Quest and fight skill XP go to every skill; check XP only to the checked skill; elf is STR minus | accepted | designer | 2026-10-23 |
 <!-- index:end -->

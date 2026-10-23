@@ -6,7 +6,7 @@ status: running           # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: How does skill XP accrue, how fast do skills level by star and use, and when do the five abilities arrive?
 verdict:                  # one line, filled in when done: the answer
-decisions: []             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0109]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -29,6 +29,8 @@ Claude's draft (2026-10-23), proposed to the designer:
 - Result: a used 3★ skill reaches level 3 (second ability) after 3 quests, 5 after 11, 8 after 30, 9 at merc Lv 10; a used 5★ skill hits 10 by merc Lv 10; unused skills trail by 2–3 levels.
 
 **Designer, 2026-10-23:** "skill should level roughly the same with their merc levels". Redrafted: skill curve = the merc curve × 100 XP (100, 200, 200, 300, 300, 400, 500, 1000, 2000); quest end 70, used in a won fight 10, check 10; star 0.75× to 1.25×; **skill level capped at the merc's level**; a skill below the merc's level gains **2× XP** (catch-up, so the Lv 3 skill catches up). Result: skills sit at the merc's level or 1 below; 1★ and unused skills lag 1.
+
+**Designer, 2026-10-23 (D-0109):** quest-end (and fight) skill XP goes to every skill; only check XP is specific. Use-tracking dropped.
 
 ## Verdict
 
