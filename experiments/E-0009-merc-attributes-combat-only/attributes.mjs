@@ -10,8 +10,7 @@ export const MOVES = 3;                                // random coin moves: eac
 export function recruit(r, race) {
   const st = Object.fromEntries(STATS.map(s => [s, 10])), any = () => STATS[Math.floor(r() * 6)];
   for (let i = 0; i < MOVES; i++) { let a, b; do { a = any(); b = any(); } while (a === b || st[a] <= 8 || st[b] >= 12); st[a]--; st[b]++; }  // RNG, kept within 8–12
-  let lean = RACES[race]; if (!lean) { const a = any(); let b; do b = any(); while (b === a); lean = [a, b]; }               // human: a random +1 / −1
-  st[lean[0]]++; st[lean[1]]--;
+  const lean = RACES[race]; if (lean) { st[lean[0]]++; st[lean[1]]--; }   // the race trait's +1 / −1 (D-0110); human: none
   const talents = [any(), any()];                      // unweighted: race doesn't steer talents
   return { race, st, talents, hp: 30 + 3 * (st.CON - 10) };
 }

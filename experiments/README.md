@@ -32,4 +32,5 @@ New record: `node tools/rec.mjs experiment "slug title"`. The table below is gen
 | [E-0008](E-0008-merc-level-up-combat-only/) | Merc level up, combat only | sim | done | merc XP from quest ends on the designer's quest curve (Lv 10 in practice), a level gives 3 attribute coins, skills at Lv 3 and Lv 5, abilities rolled at recruitment, beneath-me stress (D-0102 to D-0105) | 2026-10-23 |
 | [E-0009](E-0009-merc-attributes-combat-only/) | Merc attributes, combat only | sim | done | race +1 / −1 and mildly random starting stats (D-0106); CON, DEX and LUK scales left to the balance pass (designer) | 2026-10-23 |
 | [E-0010](E-0010-skill-ups-combat-only/) | Skill ups, combat only | sim | running |  | 2026-10-23 |
+| [E-0011](E-0011-recruit-randomness/) | Recruit randomness | sim | running |  | 2026-10-23 |
 <!-- index:end -->

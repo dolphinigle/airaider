@@ -19,9 +19,9 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 | **CON** | endurance, toughness | its battle and check skills | **max HP** (scale left to the balance pass, designer; placeholder 30 at CON 10, ±3 a point) |
 | **LUK** | luck | none (D-0095) | raises the heads chance of **every coin** (50% at 10; size per point left to the balance pass, designer) |
 
-**Starting stats** (D-0106): every stat starts at 10, then mild randomness (working: three random coin moves, each stat kept within 8–12), then the **race gives +1 to one stat and −1 to another** (a wolfkin: DEX +1, INT −1), so races don't force builds. Talents are not weighted by race (Claude).
+**Starting stats** (D-0106): every stat starts at 10, then mild randomness (working: three random coin moves, each stat kept within 8–12), then the **race trait gives +1 to one stat and −1 to another** (a wolfkin: DEX +1, INT −1; D-0110), so races don't force builds; humans get none. Talents are not weighted by race (Claude).
 
-**Races** (D-0108): **wolfkin** (DEX + / INT −), **catfolk** (CHA + / CON −), **elf** (INT + / STR −, D-0109), **dragonkin** (CON + / DEX −), **orc** (STR + / CHA −), **human** (a random + / −). Humans come in four peoples, flavor only (looks, names, writing): **northerner** (Scandinavian), **western** (European), **eastern** (Japanese), **southern** (African). Orc STR + and catfolk CHA + are the designer's; the other shifts Claude's working. Exclusive skills: Beast Blood (wolfkin, catfolk), Ancient Blood (dragonkin), both also for shapeshifters.
+**Races** (D-0108): **wolfkin** (DEX + / INT −), **catfolk** (CHA + / CON −), **elf** (INT + / STR −, D-0109), **dragonkin** (CON + / DEX −), **orc** (STR + / CHA −), **human** (none, D-0110). The shift is part of the race **trait** (D-0110). Humans come in four peoples, flavor only (looks, names, writing): **northerner** (Scandinavian), **western** (European), **eastern** (Japanese), **southern** (African). Orc STR + and catfolk CHA + are the designer's; the other shifts Claude's working. Exclusive skills: Beast Blood (wolfkin, catfolk), Ancient Blood (dragonkin), both also for shapeshifters.
 
 ## Skills (D-0021, D-0022)
 
@@ -135,7 +135,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed). **The AI is shown every mod that fits the ability and picks as many as were rolled** (designer, 2026-10-22; replaces the dealt-3-candidates idea).
 - **Ability damage is written as a % of a standard hit** (designer, 2026-10-22, Darkest Dungeon style; Cleave 60% on each of two foes). Statuses are named only for now; how they are applied is open. Brainstorm: E-0007 `brainstorm.md`.
-- **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: 10% increased damage, 10% reduced speed", "Stubborn: can't be stunned while above half HP".
+- **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. **Gender is flavor only** (D-0110). A passive never touches stat or skill coins, **except a race trait's +1 / −1** (D-0110); otherwise it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: 10% increased damage, 10% reduced speed", "Stubborn: can't be stunned while above half HP".
 
 ## Stress (D-0042)
 

@@ -1,0 +1,21 @@
+eastern human man, merc 1½★ · STR 9 DEX 10 INT 10 CHA 9 CON 11 LUK 11 · talents DEX+ CHA+ · HP 33
+  traits: man (flavor), human 1½★, Cautious 1½★, skinny 1½★
+  Unarmed 1½★: Strike the Grappled · Knockback Kick · Far Knockback Throw · Grapple · Weakening Blow ◆
+  Holy 2★: Smite ◆ · Heal Ally ◆ · Shield Ally · Shield Strike · Bless Ally
+  checks: Athletics 1½★, Persuasion 2★
+  Lv 3 offer: Berserk 2★ / Precision 2★ / Carousing 1½★   ·   Lv 5 offer: Perception 2½★ / Thievery 1½★ / Smithing 1½★
+
+western human man, merc 3★ · STR 11 DEX 9 INT 9 CHA 9 CON 11 LUK 11 · talents INT+ CON+ · HP 33
+  traits: man (flavor), human 4★, Gruff 4★, short 3½★  · first ability: a generic attack (no weapon or magic skill)
+  Alchemy 3★: Healing Potion · Poison All Foes ◆ · Fire Bomb · Armor-Breaking Acid · Poison Flask
+  Defender 2½★: Brace and Taunt · Taunt · Shield and Guard Ally · Shield Self and Taunt · Shield Ally
+  checks: Athletics 2½★, Thievery 2½★
+  Lv 3 offer: Dual Wield 3★ / Fire 2½★ / Precision 3½★   ·   Lv 5 offer: Engineering 3½★ / Streetwise 2½★ / Survival 3★
+
+elf woman, merc 2½★ · STR 10 DEX 10 INT 10 CHA 10 CON 10 LUK 10 · talents CHA+ LUK+ · HP 30
+  traits: woman (flavor), elf (INT +1, STR −1) 1½★, Pious 2½★, tall 2★  · first ability: a generic attack (no weapon or magic skill)
+  Retaliation 2½★: Payback Strike · Strike Back at Attacker · Riposte Stance ◆◆◆ · Strike and Riposte · Taunt and Riposte
+  Dirty Fighting 3★: Yank Forward · Slowing Trip ◆◆ · Weakening Cut · Stunning Flash · Exposing Strike ◆
+  checks: Intimidation 1½★, Survival 2½★
+  Lv 3 offer: Performance 3★ / Stealth 3★ / Frost 3½★   ·   Lv 5 offer: Persuasion 3★ / Smithing 3★ / Cooking 2★
+

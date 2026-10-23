@@ -46,7 +46,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0037](D-0037-a-star-up-item-sets-a-merc-to-a-fixed-star-so-5-stars-stay-v.md) | A star-up item sets a merc to a fixed star, so 5 stars stay valuable | accepted | designer | 2026-10-21 |
 | [D-0038](D-0038-race-gives-a-passive-too-a-trade-off-like-the-trait-passives.md) | Race gives a passive too, a trade-off like the trait passives | accepted | designer | 2026-10-21 |
 | [D-0039](D-0039-traits-cover-gender-race-personality-and-body.md) | Traits cover gender, race, personality and body | accepted | designer | 2026-10-21 |
-| [D-0040](D-0040-trait-passives-never-overlap-with-stats-or-skills.md) | Trait passives never overlap with stats or skills | accepted | designer | 2026-10-21 |
+| [D-0040](D-0040-trait-passives-never-overlap-with-stats-or-skills.md) | Trait passives never overlap with stats or skills | accepted → D-0110 | designer | 2026-10-21 |
 | [D-0041](D-0041-combat-basics-one-line-per-side-speed-coins-each-round-stat-.md) | Combat basics: one line per side, speed coins each round, stat plus skill coins times base | proposed | designer | 2026-10-22 |
 | [D-0042](D-0042-stress-a-darkest-dungeon-style-bar-that-carries-across-quest.md) | "Stress: a Darkest Dungeon style bar that carries across quests" | accepted | designer | 2026-10-22 |
 | [D-0043](D-0043-fight-sprites-one-ai-painted-image-per-pose-as-in-darkest-du.md) | "Fight sprites: one AI-painted image per pose, as in Darkest Dungeon" | proposed | designer | 2026-10-22 |
@@ -116,4 +116,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0107](D-0107-races-wolfkin-catfolk-elf-dragonkin-and-human-with-four-huma.md) | "Races: wolfkin, catfolk, elf, dragonkin and human, with four human peoples" | superseded → D-0108 | designer | 2026-10-23 |
 | [D-0108](D-0108-races-add-orc-catfolk-shifts-cha.md) | "Races: wolfkin, catfolk, elf, dragonkin, orc and human, with four human peoples" | accepted | designer | 2026-10-23 |
 | [D-0109](D-0109-quest-and-fight-skill-xp-go-to-every-skill-check-xp-only-to-.md) | Quest and fight skill XP go to every skill; check XP only to the checked skill; elf is STR minus | accepted | designer | 2026-10-23 |
+| [D-0110](D-0110-race-and-gender-are-traits-a-race-trait-carries-its-stat-shi.md) | Race and gender are traits; a race trait carries its stat shift; humans and gender have no effect | accepted | designer | 2026-10-23 |
 <!-- index:end -->
