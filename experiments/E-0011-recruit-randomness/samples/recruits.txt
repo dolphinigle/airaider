@@ -1,21 +1,21 @@
-eastern human man, merc 1½★ · STR 9 DEX 10 INT 10 CHA 9 CON 11 LUK 11 · talents DEX+ CHA+ · HP 33
+eastern human man, merc 1½★ · STR 10 DEX 12 INT 10 CHA 11 CON 8 LUK 10 · talents DEX+ CHA+ · HP 24
   traits: man (flavor), human, Cautious 2★, skinny 1½★
   Unarmed 1½★: Strike the Grappled · Knockback Kick · Far Knockback Throw · Grapple · Weakening Blow ◆
   Holy 2★: Smite ◆ · Heal Ally ◆ · Shield Ally · Shield Strike · Bless Ally
   checks: Athletics 1½★, Persuasion 2★
   Lv 3 offer: Berserk 2★ / Precision 2★ / Carousing 1½★   ·   Lv 5 offer: Perception 2½★ / Thievery 1½★ / Smithing 1½★
 
-western human man, merc 3★ · STR 11 DEX 9 INT 9 CHA 9 CON 11 LUK 11 · talents INT+ CON+ · HP 33
-  traits: man (flavor), human, Gruff 3★, short 4★  · first ability: a generic attack (no weapon or magic skill)
-  Alchemy 3★: Healing Potion · Poison All Foes ◆ · Fire Bomb · Armor-Breaking Acid · Poison Flask
-  Defender 2½★: Brace and Taunt · Taunt · Shield and Guard Ally · Shield Self and Taunt · Shield Ally
-  checks: Athletics 2½★, Thievery 2½★
-  Lv 3 offer: Dual Wield 3★ / Fire 2½★ / Precision 3½★   ·   Lv 5 offer: Engineering 3½★ / Streetwise 2½★ / Survival 3★
+western human man, merc 3★ · STR 10 DEX 11 INT 9 CHA 11 CON 10 LUK 12 · talents DEX+ STR+ · HP 30
+  traits: man (flavor), human, Gruff 3★, short 3★
+  Dirty Fighting 2½★: Blinding Dust · Weakening Cut · Slowing Trip · Mark Target · Stunning Flash
+  Fire 4★: Strong Burn · Cauterize Wounds ◆◆ · Close Fire Spray ◆◆ · Heavy Close Fire Strike · Fireball ◆
+  checks: Athletics 3½★, Thievery 3★
+  Lv 3 offer: Stealth 2½★ / Holy 3★ / Weapon and Shield 3½★   ·   Lv 5 offer: Survival 3½★ / Perception 3½★ / Engineering 3½★
 
-elf woman, merc 2½★ · STR 10 DEX 10 INT 10 CHA 10 CON 10 LUK 10 · talents CHA+ LUK+ · HP 30
-  traits: woman (flavor), elf (INT +1, STR −1), Pious 2½★, tall 1½★  · first ability: a generic attack (no weapon or magic skill)
-  Retaliation 2½★: Payback Strike · Strike Back at Attacker · Riposte Stance ◆◆◆ · Strike and Riposte · Taunt and Riposte
-  Dirty Fighting 3★: Yank Forward · Slowing Trip ◆◆ · Weakening Cut · Stunning Flash · Exposing Strike ◆
-  checks: Intimidation 1½★, Survival 2½★
-  Lv 3 offer: Performance 3★ / Stealth 3★ / Frost 3½★   ·   Lv 5 offer: Persuasion 3★ / Smithing 3★ / Cooking 2★
+elf woman, merc 2½★ · STR 10 DEX 12 INT 13 CHA 11 CON 11 LUK 12 · talents INT+ STR+ · HP 33
+  traits: woman (flavor), elf (INT +1, STR −1), Reckless 3★, skinny 1½★  · first ability: a generic attack (no weapon or magic skill)
+  Berserk 2½★: Feeding Strike ◆ · Bloodthirst · Catch Breath · Blood Rage · Wounded Fury
+  Alchemy 2½★: Healing Potion ◆ · Poison Flask · Burst Poison ◆ · Poison All Foes · Blinding Powder
+  checks: Smithing 2½★, Thievery 2½★
+  Lv 3 offer: Dirty Fighting 1½★ / Animal Companion 2½★ / Precision 2★   ·   Lv 5 offer: Intimidation 3★ / Athletics 2★ / Persuasion 3★
 

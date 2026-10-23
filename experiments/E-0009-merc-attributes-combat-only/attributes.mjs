@@ -6,10 +6,9 @@ const STATS = ['STR', 'DEX', 'INT', 'CHA', 'CON', 'LUK'];
 export const RACES = {
   human: null, wolfkin: ['DEX', 'INT'], catfolk: ['CHA', 'CON'], elf: ['INT', 'STR'], dragonkin: ['CON', 'DEX'], orc: ['STR', 'CHA'],   // D-0108; human peoples are flavor only
 };
-export const MOVES = 3;                                // random coin moves: each takes 1 from a random stat and gives it to another
+export const LOW = 8, HIGH = 12;                       // D-0112: each stat rolled on its own, uniform 8–12, like Battle Brothers
 export function recruit(r, race) {
-  const st = Object.fromEntries(STATS.map(s => [s, 10])), any = () => STATS[Math.floor(r() * 6)];
-  for (let i = 0; i < MOVES; i++) { let a, b; do { a = any(); b = any(); } while (a === b || st[a] <= 8 || st[b] >= 12); st[a]--; st[b]++; }  // RNG, kept within 8–12
+  const st = Object.fromEntries(STATS.map(s => [s, LOW + Math.floor(r() * (HIGH - LOW + 1))])), any = () => STATS[Math.floor(r() * 6)];
   const lean = RACES[race]; if (lean) { st[lean[0]]++; st[lean[1]]--; }   // the race trait's +1 / −1 (D-0110); human: none
   const talents = [any(), any()];                      // unweighted: race doesn't steer talents
   return { race, st, talents, hp: 30 + 3 * (st.CON - 10) };
@@ -25,7 +24,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   } else if (cmd === 'spread') {
     const r = rng(1), N = 20000, hist = {}; let spread = 0;
     for (let i = 0; i < N; i++) { const m = recruit(r, 'human'); for (const s of STATS) hist[m.st[s]] = (hist[m.st[s]] || 0) + 1; spread += Math.max(...STATS.map(s => m.st[s])) - Math.min(...STATS.map(s => m.st[s])); }
-    console.log('starting stat values (all stats, human): ' + Object.keys(hist).sort((a, b) => a - b).map(k => `${k}: ${(hist[k] / N / 6 * 100).toFixed(0)}%`).join('  ') + `  · highest − lowest stat, average ${(spread / N).toFixed(1)}`);
+    let tot = []; for (let i = 0; i < N; i++) { const m = recruit(r, 'human'); tot.push(STATS.reduce((a, s) => a + m.st[s], 0)); } tot.sort((a, b) => a - b);
+    console.log('starting stat values (all stats, human): ' + Object.keys(hist).sort((a, b) => a - b).map(k => `${k}: ${(hist[k] / N / 6 * 100).toFixed(0)}%`).join('  ') + `  · highest − lowest stat, average ${(spread / N).toFixed(1)}` + `\nstat total (6 stats, 60 = average): 10th percentile ${tot[N * 0.1 | 0]}, median ${tot[N / 2]}, 90th ${tot[N * 0.9 | 0]}`);
   } else if (cmd === 'speed') {
     const D = [8, 10, 12, 15, 18, 21];
     console.log('chance the row DEX acts before the column DEX (ties split)\n      ' + D.map(d => String(d).padEnd(6)).join(''));

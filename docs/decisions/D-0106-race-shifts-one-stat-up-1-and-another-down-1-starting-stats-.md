@@ -1,11 +1,11 @@
 ---
 id: D-0106
 title: Race shifts one stat up 1 and another down 1; starting stats get mild randomness
-status: accepted          # proposed | accepted | rejected | superseded
+status: superseded          # proposed | accepted | rejected | superseded
 date: 2026-10-23          # the day it got its current status
 decided-by: designer      # designer (design: what the game does) | claude (implementation: how the engine does it)
 supersedes: []            # e.g. [D-0003]
-superseded-by:            # set when a later record replaces this one; the only edit allowed after acceptance
+superseded-by: D-0112
 evidence: [E-0009]        # experiments behind it, e.g. [E-0002]
 sources: []               # archived ideas it brings back, e.g. [archive/v3/ECONOMY.md §3]
 ---

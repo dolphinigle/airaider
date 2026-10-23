@@ -1,16 +1,17 @@
-human      STR 12  DEX 10  INT 10  CHA 10  CON 8   LUK 10  talents INT+ STR+  HP 24
-wolfkin    STR 11  DEX 9   INT 10  CHA 11  CON 9   LUK 10  talents CON+ LUK+  HP 27
-catfolk    STR 11  DEX 8   INT 10  CHA 10  CON 11  LUK 10  talents LUK+ DEX+  HP 33
-elf        STR 8   DEX 10  INT 11  CHA 10  CON 12  LUK 9   talents CON+ STR+  HP 36
-dragonkin  STR 8   DEX 9   INT 12  CHA 11  CON 11  LUK 9   talents CHA+ LUK+  HP 33
-orc        STR 11  DEX 10  INT 10  CHA 9   CON 9   LUK 11  talents CON++  HP 27
-human      STR 9   DEX 10  INT 11  CHA 11  CON 10  LUK 9   talents INT+ LUK+  HP 30
-wolfkin    STR 12  DEX 11  INT 8   CHA 9   CON 10  LUK 10  talents CHA++  HP 30
-catfolk    STR 11  DEX 8   INT 9   CHA 12  CON 9   LUK 11  talents CON+ LUK+  HP 27
-elf        STR 11  DEX 9   INT 12  CHA 10  CON 9   LUK 9   talents LUK+ CON+  HP 27
-dragonkin  STR 10  DEX 9   INT 8   CHA 11  CON 11  LUK 11  talents DEX+ CHA+  HP 33
-orc        STR 13  DEX 10  INT 9   CHA 9   CON 9   LUK 10  talents LUK+ INT+  HP 27
-starting stat values (all stats, human): 8: 6%  9: 24%  10: 41%  11: 24%  12: 6%  · highest − lowest stat, average 2.7
+human      STR 11  DEX 8   INT 10  CHA 8   CON 11  LUK 10  talents INT+ STR+  HP 33
+wolfkin    STR 9   DEX 11  INT 7   CHA 8   CON 11  LUK 10  talents CON+ LUK+  HP 33
+catfolk    STR 9   DEX 11  INT 9   CHA 12  CON 9   LUK 12  talents CHA+ STR+  HP 27
+elf        STR 11  DEX 9   INT 13  CHA 11  CON 10  LUK 11  talents STR+ INT+  HP 30
+dragonkin  STR 11  DEX 7   INT 8   CHA 10  CON 13  LUK 11  talents CON++  HP 39
+orc        STR 11  DEX 10  INT 8   CHA 8   CON 10  LUK 12  talents INT++  HP 30
+human      STR 10  DEX 10  INT 11  CHA 10  CON 12  LUK 10  talents STR+ CHA+  HP 36
+wolfkin    STR 11  DEX 11  INT 9   CHA 12  CON 10  LUK 11  talents CON+ STR+  HP 30
+catfolk    STR 8   DEX 9   INT 9   CHA 10  CON 9   LUK 8   talents CHA++  HP 27
+elf        STR 9   DEX 12  INT 13  CHA 11  CON 9   LUK 11  talents DEX+ STR+  HP 27
+dragonkin  STR 11  DEX 11  INT 9   CHA 8   CON 12  LUK 9   talents CHA++  HP 36
+orc        STR 13  DEX 8   INT 12  CHA 11  CON 9   LUK 8   talents STR+ LUK+  HP 27
+starting stat values (all stats, human): 8: 20%  9: 20%  10: 20%  11: 20%  12: 20%  · highest − lowest stat, average 3.4
+stat total (6 stats, 60 = average): 10th percentile 56, median 60, 90th 65
 chance the row DEX acts before the column DEX (ties split)
       8     10    12    15    18    21    
 8      50%   32%   19%    8%    3%    1%  

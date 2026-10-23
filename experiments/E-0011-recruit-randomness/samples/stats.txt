@@ -1,4 +1,4 @@
 progress 0: merc stars 1★ 30% 1½★ 22% 2★ 18% 2½★ 12% 3★ 8% 3½★ 5% 4★ 3% 4½★ 1% 5★ 0%
-  starting abilities by mods 0–4: 74.3% / 22.5% / 2.8% / 0.4% / 0.0% · by base rarity 1★–5★: 46% / 41% / 9% / 3% / 0% · generic first attack 29%
+  starting abilities by mods 0–4: 74.4% / 22.4% / 2.8% / 0.4% / 0.0% · by base rarity 1★–5★: 46% / 42% / 9% / 3% / 0% · generic first attack 29%
 progress 1: merc stars 1★ 8% 1½★ 10% 2★ 14% 2½★ 16% 3★ 16% 3½★ 14% 4★ 11% 4½★ 7% 5★ 4%
-  starting abilities by mods 0–4: 61.8% / 31.0% / 6.1% / 1.1% / 0.0% · by base rarity 1★–5★: 45% / 40% / 10% / 5% / 0% · generic first attack 29%
+  starting abilities by mods 0–4: 61.9% / 30.8% / 6.1% / 1.1% / 0.0% · by base rarity 1★–5★: 45% / 40% / 10% / 5% / 0% · generic first attack 29%

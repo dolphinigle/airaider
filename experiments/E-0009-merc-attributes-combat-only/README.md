@@ -6,7 +6,7 @@ status: done              # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: How do starting stats, races and talents roll, and what is each attribute worth in a fight (HP, speed, LUK)?
 verdict: race +1 / −1 and mildly random starting stats (D-0106); CON, DEX and LUK scales left to the balance pass (designer)  # one line, filled in when done: the answer
-decisions: [D-0106, D-0107, D-0108]             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0106, D-0107, D-0108, D-0112]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -32,6 +32,8 @@ Claude's draft (2026-10-23), proposed to the designer:
 **Designer, 2026-10-23 (D-0106):** race only +1 / −1 so it doesn't force builds; starting stats mildly random. Now: three random coin moves within 8–12, then the race's +1 / −1; talents unweighted. 82% of starting stats at 9–11.
 
 ## Verdict
+
+**Later (D-0112):** starting attributes roll each stat on its own, uniform 8–12, as in Battle Brothers (the zero-sum coin moves left some recruits at all 10s).
 
 Starting stats: 10 each, mild randomness, race +1 / −1 (D-0106); races don't force builds. **The exact CON (HP), DEX (speed) and LUK (heads) scales stay open for the balance pass** (designer, 2026-10-23: "for CON/DEX/LUK exact number just leave it open for balancer later to modify, dont lock those"); Claude's numbers above are placeholders. Two-attribute rounding stays Claude's working call (up).
 
