@@ -6,7 +6,7 @@ status: running           # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: What XP curve, cap and combat gains should a merc level have, and how does a Lv 1 → 12 career feel?
 verdict:                  # one line, filled in when done: the answer
-decisions: [D-0102, D-0103]             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0102, D-0103, D-0104]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -31,6 +31,8 @@ Claude's draft (2026-10-23), proposed to the designer:
 **Designer, 2026-10-23, reshaped it (D-0102):** XP from quest ends, curve in quests, soft cap past Lv 10, 4+ below gives 0%, start 2 battle + 2 check skills, battle skill at Lv 3, check skill at Lv 5; asked for a penalty on overleveled mercs (D-0103, proposed: stress). The sim now runs the quest curve 1, 1, 1, 2, 2, 2, 3, 3, 3, 6, 12 (Lv 12 after 36 quests).
 
 **Designer, 2026-10-23, replaced the curve:** "maybe 1 2 2 3 3 4 5 10 20 100 1000 10000?" (quests at level to the next level). Lv 10 after 50 quests, Lv 11 after 150, Lv 12 after 1150.
+
+**Designer, 2026-10-23:** beneath-me stress too low (raised to 25 / 50 a node, D-0103 accepted); abilities, mods and skill offers rolled and AI-picked at recruitment; a weapon or magic skill's first ability has 0 cd; Lv 3 / Lv 5 skills pick 1 of 3 (D-0104).
 
 Samples: `samples/career-seed7.txt`, `samples/stats.txt`.
 

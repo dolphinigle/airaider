@@ -102,7 +102,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 - XP from quests **below the merc's level is penalized**, as in Path of Exile; **4+ levels below gives none** (D-0102). Quests have levels.
 - At the XP threshold a **Level up** button appears; the player presses it **at the base, between quests** (D-0102). XP overflows into the next level.
 - Working: 100 XP for a quest at the merc's level (Claude). **Quests at level to the next level** (designer, 2026-10-23, "maybe"; replaces D-0102's working curve): 1, 2, 2, 3, 3, 4, 5, 10, 20, 100, 1000, 10000, so Lv 8 after 20 quests, Lv 10 after 50, Lv 11 after 150, Lv 12 after 1150. Penalty: full XP down to 1 below, 2 below 50%, 3 below 20% (Claude).
-- Proposed (D-0103): a merc 3+ levels above the quest gains stress at every node, and skill XP follows the same penalty.
+- **Beneath me** (D-0103): a merc 3 levels above the quest gains 25 stress at every node, 4+ above 50 (working); skill XP follows the same penalty.
 
 ## Level up
 
@@ -113,7 +113,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875 each (others about +0.42), with five stats; slightly less on the others with six.
 
-**The player's choice is a skill** (D-0102, replaces D-0035): a merc **starts with 2 battle skills and 2 check skills**, gains **a new battle skill at Lv 3** and **a new check skill at Lv 5**. Working (Claude): each is a pick of 1 of 3, hidden until then, rolled at recruitment (weighted by race and background, from skills the merc lacks).
+**The player's choice is a skill** (D-0102, replaces D-0035): a merc **starts with 2 battle skills and 2 check skills**, gains **a new battle skill at Lv 3** and **a new check skill at Lv 5**. Each is a **pick of 1 of 3** (D-0104), hidden until then, rolled at recruitment (weighted by race and background, from skills the merc lacks).
 
 ## Stars (D-0067, D-0069)
 
@@ -128,6 +128,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - Every merc's **first ability is a 0-cooldown attack**, a normal ability: from their skills (most skills have one, e.g. Light Weapons' Double Attack) or, as a fallback, a **generic** attack anyone can get (Smash, Kick) (D-0050); generic bases can also come up, rarely, on any level up (D-0051).
 - The player sees only the AI name, never the base (D-0048).
 - Only **battle skills** give abilities (D-0058). Each has **about 10–20 base abilities** (designer 2026-10-23: 10–30 in the final game; a default attack is any 0-cooldown damaging ability, so a skill may have several; not yet a decision); weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick (D-0090).
+- **Rolled at recruitment** (D-0104): the skill offers and the bases and mods for all five abilities of each battle skill; the AI picks and names them all when the merc is made, and skill level ups only reveal them. **A weapon or magic skill's first ability has 0 cooldown** (D-0104).
 - **Some battle-skill level ups give a new ability** from that skill, not every one (D-0069; working: skill levels 1, 3, 5, 7, 9), with modifiers by the skill's star. A merc level up gives attributes only. The engine deals the AI a few random bases from that skill that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed). **The AI is shown every mod that fits the ability and picks as many as were rolled** (designer, 2026-10-22; replaces the dealt-3-candidates idea).

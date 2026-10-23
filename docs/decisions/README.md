@@ -109,5 +109,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0100](D-0100-which-battle-skills-can-be-checked.md) | Which battle skills can be checked | accepted | designer | 2026-10-22 |
 | [D-0101](D-0101-rank-movement-warfare-moves-allies-five-skills-move-foes.md) | Rank movement: Warfare moves allies, five skills move foes | accepted | designer | 2026-10-23 |
 | [D-0102](D-0102-merc-xp-comes-from-quest-ends-with-a-soft-cap-past-lv-10-mer.md) | Merc XP comes from quest ends with a soft cap past Lv 10; mercs start with 2 battle and 2 check skills, gain a battle skill at Lv 3 and a check skill at Lv 5 | accepted | designer | 2026-10-23 |
-| [D-0103](D-0103-mercs-sent-on-quests-far-below-their-level-gain-stress-and-e.md) | Mercs sent on quests far below their level gain stress and earn no XP | proposed | designer | 2026-10-23 |
+| [D-0103](D-0103-mercs-sent-on-quests-far-below-their-level-gain-stress-and-e.md) | Mercs sent on quests far below their level gain stress and earn no XP | accepted | designer | 2026-10-23 |
+| [D-0104](D-0104-abilities-and-skill-offers-are-rolled-at-recruitment-and-the.md) | Abilities and skill offers are rolled at recruitment and the AI picks them all up front; a weapon or magic skill's first ability has 0 cooldown; Lv 3 and Lv 5 skills are picks of 1 of 3 | accepted | designer | 2026-10-23 |
 <!-- index:end -->

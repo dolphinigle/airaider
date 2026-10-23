@@ -15,6 +15,8 @@ export const penalty = below => below <= 1 ? 1 : below === 2 ? 0.5 : below === 3
 
 const STATS = ['STR', 'DEX', 'INT', 'CHA', 'CON', 'LUK'];
 const SK = Object.fromEntries(all().map(k => [k.name, k]));
+// D-0104: a weapon or magic skill's first ability has 0 cooldown (read as a 0-cd attack)
+const FIRST_0CD = ['Two-handed', 'Polearm', 'Weapon and Shield', 'Dual Wield', 'Single Weapon', 'Unarmed', 'Shooting', 'Throwing', 'Fire', 'Frost', 'Lightning', 'Holy', 'Dark'];
 const DEAL_W = [0, 8, 6, 3, 2, 1];                     // placeholder odds by ability star when an ability is dealt
 
 function levelUp(r, m) {                               // D-0018: exactly three coins, at most one per stat
@@ -26,7 +28,7 @@ function levelUp(r, m) {                               // D-0018: exactly three 
   return [...got];
 }
 function newAbility(r, m, skill) {
-  const pool = SK[skill].abilities.filter(a => !m.known.some(k => k.name === a.name) && (m.known.length || /^0 cd/.test(a.cost) && /%/.test(a.power)));
+  const pool = SK[skill].abilities.filter(a => !m.known.some(k => k.name === a.name) && (m.known.some(k => k.skill === skill) || !FIRST_0CD.includes(skill) || /^0 cd/.test(a.cost) && /%/.test(a.power)));
   const deal = []; for (let i = 0; i < 3 && pool.length; i++) { let x = r() * pool.reduce((s, a) => s + DEAL_W[a.star], 0), j = 0; while ((x -= DEAL_W[pool[j].star]) > 0) j++; deal.push(pool.splice(j, 1)[0]); }
   const a = deal[0]; m.known.push({ ...a, skill }); return a;
 }
