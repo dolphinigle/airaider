@@ -32,6 +32,7 @@ Rules:
 
 - **Quests as the merc XP unit, and anti-grind as a cost.** The designer moved merc XP from fights won to quest ends (fights and checks feed skills only), and zero XP on easy quests wasn't enough: an overleveled merc must pay (stress per node, increased stress taken) so carrying and farming are choices with a price. Designer ruling, untested in play. (E-0008)
 - **Race as flavor, not a build.** The designer cut Claude's +2 / +1 / −1 race lean and race-weighted talents to a +1 / −1 shift plus mild randomness: races shouldn't force builds; their identity lives in passives and exclusive skills. (E-0009)
+- **The AI picks a merc's skills from engine deals, like its abilities.** The designer preferred an AI pick from legal candidates over a stat-based lean: the engine keeps the rules (one weapon skill, blood skills by race, a weapon or magic skill to open with), the AI makes the merc coherent. Designer ruling, untested in play. (E-0011)
 ## Doesn't work
 
 - **AI-written engaging story as the main source of fun.** v3 spent about a week on story pipelines (sagas, synopsis prompts, judge rounds) and the scorecard stayed near 6/10. (D-0002)

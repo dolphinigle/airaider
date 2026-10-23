@@ -120,4 +120,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0111](D-0111-race-traits-have-no-star.md) | Race traits have no star | accepted | designer | 2026-10-23 |
 | [D-0112](D-0112-starting-attributes-roll-each-stat-on-its-own-like-battle-br.md) | Starting attributes roll each stat on its own, like Battle Brothers | superseded → D-0113 | designer | 2026-10-23 |
 | [D-0113](D-0113-starting-attributes-roll-5-to-15-on-a-bell-curve.md) | Starting attributes roll 5 to 15 on a bell curve | accepted | designer | 2026-10-23 |
+| [D-0114](D-0114-every-recruit-starts-with-a-weapon-or-magic-skill-the-ai-pic.md) | Every recruit starts with a weapon or magic skill; the AI picks skills from engine deals with no talent lean | accepted | designer | 2026-10-23 |
 <!-- index:end -->

@@ -1,21 +1,21 @@
-eastern human man, merc 1½★ · STR 10 DEX 12 INT 10 CHA 11 CON 7 LUK 10 · talents DEX+ CHA+ · HP 21
-  traits: man (flavor), human, Cautious 2★, skinny 1½★
-  Unarmed 1½★: Strike the Grappled · Knockback Kick · Far Knockback Throw · Grapple · Weakening Blow ◆
-  Holy 2★: Smite ◆ · Heal Ally ◆ · Shield Ally · Shield Strike · Bless Ally
-  checks: Athletics 1½★, Persuasion 2★
-  Lv 3 offer: Berserk 2★ / Precision 2★ / Carousing 1½★   ·   Lv 5 offer: Perception 2½★ / Thievery 1½★ / Smithing 1½★
+eastern human woman, merc 1½★ · STR 10 DEX 12 INT 10 CHA 11 CON 7 LUK 10 · talents DEX+ CHA+ · HP 21
+  traits: woman (flavor), human, Gruff 1½★, nimble 1★, Cold 1★
+  Shooting 1★: Slowing Shot · Bleeding Shot · Aimed Shot · Close Shot · Back-Rank Shot ◆
+  Defender 1★: Shield and Guard Ally · Shield Ally · Taunt · Shield Self and Taunt · Guard Ally
+  checks: Engineering 1½★, Intimidation 1★
+  Lv 3 offer: Performance 1½★ / Dark 1★ / Alchemy 1★   ·   Lv 5 offer: Streetwise 2★ / Survival 1½★ / Cooking 1★
 
 western human man, merc 3★ · STR 10 DEX 11 INT 9 CHA 11 CON 10 LUK 13 · talents DEX+ STR+ · HP 30
-  traits: man (flavor), human, Gruff 3★, short 3★
-  Dirty Fighting 2½★: Blinding Dust · Weakening Cut · Slowing Trip · Mark Target · Stunning Flash
-  Fire 4★: Strong Burn · Cauterize Wounds ◆◆ · Close Fire Spray ◆◆ · Heavy Close Fire Strike · Fireball ◆
-  checks: Athletics 3½★, Thievery 3★
-  Lv 3 offer: Stealth 2½★ / Holy 3★ / Weapon and Shield 3½★   ·   Lv 5 offer: Survival 3½★ / Perception 3½★ / Engineering 3½★
+  traits: man (flavor), human, Cheerful 2★, muscular 3½★
+  Lightning 3½★: Arcing Bolt · Spread Shock ◆ · Shock All Foes ◆ · Shocking Spark ◆ · Chain Lightning
+  Shooting 2½★: Back-Rank Shot · Aimed Shot ◆ · Bleeding Shot · Slowing Shot · Ricochet Shot
+  checks: Smithing 3★, Cooking 2½★
+  Lv 3 offer: Dirty Fighting 3★ / Holy 3★ / Frost 2½★   ·   Lv 5 offer: Thievery 3★ / Intimidation 3★ / Streetwise 2★
 
-elf woman, merc 2½★ · STR 10 DEX 13 INT 13 CHA 11 CON 11 LUK 12 · talents INT+ STR+ · HP 33
-  traits: woman (flavor), elf (INT +1, STR −1), Reckless 3★, skinny 1½★  · first ability: a generic attack (no weapon or magic skill)
-  Berserk 2½★: Feeding Strike ◆ · Bloodthirst · Catch Breath · Blood Rage · Wounded Fury
-  Alchemy 2½★: Healing Potion ◆ · Poison Flask · Burst Poison ◆ · Poison All Foes · Blinding Powder
-  checks: Smithing 2½★, Thievery 2½★
-  Lv 3 offer: Dirty Fighting 1½★ / Animal Companion 2½★ / Precision 2★   ·   Lv 5 offer: Intimidation 3★ / Athletics 2★ / Persuasion 3★
+elf man, merc 2½★ · STR 10 DEX 13 INT 13 CHA 11 CON 11 LUK 12 · talents INT+ STR+ · HP 33
+  traits: man (flavor), elf (INT +1, STR −1), Greedy 2★, scarred 2★
+  Frost 2½★: Frost Strike and Shield ◆ · Ice Shield · Chilling Ice Shield ◆ · Strong Chill ◆ · Chilling Lance
+  Fire 2½★: Cauterize Wounds ◆ · Close Fire Sweep · Close Fire Spray · Strong Burn · Back-Rank Fire Lash
+  checks: Smithing 3★, Persuasion 3★
+  Lv 3 offer: Doctor 1½★ / Animal Companion 3★ / Dark 3★   ·   Lv 5 offer: Cooking 2½★ / Survival 2½★ / Intimidation 1½★
 

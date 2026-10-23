@@ -23,13 +23,11 @@ const RACE_W = { human: 40, wolfkin: 12, catfolk: 12, elf: 12, dragonkin: 12, or
 const PERSONALITY = ['Stubborn', 'Reckless', 'Gruff', 'Cheerful', 'Cautious', 'Greedy', 'Pious', 'Cold'], BODY = ['tall', 'short', 'muscular', 'skinny', 'scarred', 'nimble'];
 const DEAL_W = st => [0, 8, 6, 3, 2 + (st - 3), 1].map((w, i) => i >= 3 ? w * (0.5 + st / 4) : w);   // rarer bases likelier at higher skill stars
 
-// a skill fits a talent if it uses a talented attribute: twice as likely (soft lean, not forced)
-const fitW = (talents, attr) => attr.split(' + ').some(a => talents.includes(a)) ? 2 : 1;
-function battleSkill(r, m, have) {
-  const ok = BATTLE.filter(k => !have.some(h => h.name === k.name) && !(WEAPON.has(k.name) && have.some(h => WEAPON.has(h.name)))
-    && (!BLOOD[k.name] || BLOOD[k.name].includes(m.race)) && !(BLOOD[k.name] && have.some(h => BLOOD[h.name])));
-  return choose(r, ok, k => fitW(m.talents, k.attr));
-}
+// D-0114: the engine deals skills (rules applied, no talent lean) and the AI picks the ones that fit the merc; the sim picks at random
+const legal = (m, have) => BATTLE.filter(k => !have.some(h => h.name === k.name) && !(WEAPON.has(k.name) && have.some(h => WEAPON.has(h.name)))
+  && (!BLOOD[k.name] || BLOOD[k.name].includes(m.race)) && !(BLOOD[k.name] && have.some(h => BLOOD[h.name])));
+const deal = (r, pool, n) => { const p = [...pool], out = []; while (out.length < n && p.length) out.push(p.splice(Math.floor(r() * p.length), 1)[0]); return out; };
+const aiPick = (r, dealt, n) => deal(r, dealt, n);   // stand-in for the AI's pick
 function abilities(r, k, star) {                       // D-0104: all five pre-rolled; first of a weapon/magic skill is a 0-cd attack
   const pool = [...k.abilities], out = [];
   for (let i = 0; i < 5 && pool.length; i++) {
@@ -44,11 +42,12 @@ export function makeRecruit(seed, progress = 0) {
   const r = rng(seed), race = choose(r, Object.keys(RACE_W), x => RACE_W[x]);
   const st = STARS[pick(r, PULL_EARLY.map((e, i) => e * (1 - progress) + PULL_LATE[i] * progress))];
   const base = rollStats(r, race), m = { race, people: race === 'human' ? choose(r, PEOPLES) : null, star: st, stats: base.st, talents: base.talents, hp: base.hp };
-  const battle = []; for (let i = 0; i < 2; i++) battle.push(battleSkill(r, m, battle));
-  const offer3 = []; for (let i = 0; i < 3; i++) offer3.push(battleSkill(r, m, [...battle, ...offer3]));
-  const checks = Object.keys(CHECK), ck = [], offer5 = [];
-  for (let i = 0; i < 2; i++) ck.push(choose(r, checks.filter(c => !ck.includes(c)), c => fitW(m.talents, CHECK[c])));
-  for (let i = 0; i < 3; i++) offer5.push(choose(r, checks.filter(c => !ck.includes(c) && !offer5.includes(c)), c => fitW(m.talents, CHECK[c])));
+  // starting battle skills: one weapon or magic skill (D-0114), then one more; deals of 4, the AI picks one from each
+  const wm = aiPick(r, deal(r, legal(m, []).filter(k => WEAPON.has(k.name) || MAGIC.has(k.name)), 4), 1);
+  const battle = [...wm, ...aiPick(r, deal(r, legal(m, wm), 4), 1)];
+  const offer3 = aiPick(r, deal(r, legal(m, battle), 6), 3);                       // Lv 3 offer: deal 6, the AI picks the 3 the player will see
+  const checks = Object.keys(CHECK), ck = aiPick(r, deal(r, checks, 4), 2);
+  const offer5 = aiPick(r, deal(r, checks.filter(c => !ck.includes(c)), 6), 3);
   const sk = k => { const s = near(r, st); return { name: k.name ?? k, star: s, ...(k.abilities ? { abil: abilities(r, k, s) } : {}) }; };
   Object.assign(m, { battle: battle.map(sk), checks: ck.map(sk), lv3: offer3.map(sk), lv5: offer5.map(sk) });
   const sh = RACES[race];

@@ -115,7 +115,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875 each (others about +0.42), with five stats; slightly less on the others with six.
 
-**The player's choice is a skill** (D-0102, replaces D-0035): a merc **starts with 2 battle skills and 2 check skills**, gains **a new battle skill at Lv 3** and **a new check skill at Lv 5**. Each is a **pick of 1 of 3** (D-0104), hidden until then, rolled at recruitment (weighted by race and background, from skills the merc lacks).
+**Skills are dealt by the engine and picked by the AI** at recruitment (D-0114), no talent lean; **one starting battle skill is always a weapon or magic skill**. **The player's choice is a skill** (D-0102, replaces D-0035): a merc **starts with 2 battle skills and 2 check skills**, gains **a new battle skill at Lv 3** and **a new check skill at Lv 5**. Each is a **pick of 1 of 3** (D-0104), hidden until then, rolled at recruitment (weighted by race and background, from skills the merc lacks).
 
 ## Stars (D-0067, D-0069)
 
@@ -161,9 +161,9 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - A **reroll item** (like Path of Exile's Chaos Orb) rerolls the merc's seed, probably resetting their level too.
 - A reset keeps everything (the **starting position**) except the **level-up seed**, which decides only what level ups roll (D-0032).
 
-## The recruit's gacha
+## The recruit's gacha (E-0011)
 
-Rolled when a merc is generated: race, rarity, starting stats, talents, starting skills, starting abilities, personality traits, and the hidden skill-unlock options.
+Rolled when a merc is generated, in order: race (and a human's people); merc star (by game progress); starting stats (D-0113) and two talents; skills (2 battle, one weapon or magic, + 2 check) and the Lv 3 / Lv 5 offers, engine-dealt and AI-picked (D-0114); skill stars around the merc's star; all five abilities per battle skill with mods (D-0104); traits: gender (flavor), race (no star, D-0111), personality (a second 25%), body. Working odds: E-0011 `recruit.mjs` (human 40%, other races 12% each; skill and trait stars: same as the merc 45%, ±½★ 20% each, ±1★ 7.5% each).
 
 ## Open
 

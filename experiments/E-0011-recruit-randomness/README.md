@@ -2,11 +2,11 @@
 id: E-0011
 title: Recruit randomness
 date: 2026-10-23
-status: running           # planned | running | done | abandoned
+status: done              # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: What is rolled when a merc is made, with what odds, and do the recruits read as varied but fair?
-verdict:                  # one line, filled in when done: the answer
-decisions: [D-0110, D-0111]       # decisions it led to or proposed, e.g. [D-0005]
+verdict: recruits roll race, star, bell-curve stats, talents, AI-picked skills (one weapon or magic) and pre-rolled abilities; race and gender are star-less traits (D-0110, D-0111, D-0113, D-0114)  # one line, filled in when done: the answer
+decisions: [D-0110, D-0111, D-0113, D-0114]       # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -34,5 +34,7 @@ Numbers: early game 74% of starting abilities have no mod, 22% one, 3% two; late
 Mid-session ruling (D-0110): race and gender are traits; the race trait carries the stat shift; humans none; gender flavor only.
 
 ## Verdict
+
+Designer rulings: one starting battle skill is always weapon or magic; skills are engine-dealt and AI-picked with no talent lean (D-0114); race and gender are traits, the race trait carries the stat shift, humans and gender no effect (D-0110); race traits have no star (D-0111); starting attributes 5–15 on a bell curve (D-0113). Skill-star spread and race odds left to Claude. Generic first attacks drop from 29% to 0%.
 
 ## Next
