@@ -19,7 +19,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 | **CON** | endurance, toughness | its battle and check skills | **max HP** (scale left to the balance pass, designer; placeholder 30 at CON 10, ±3 a point) |
 | **LUK** | luck | none (D-0095) | raises the heads chance of **every coin** (50% at 10; size per point left to the balance pass, designer) |
 
-**Starting stats** (D-0112): **each stat rolled on its own**, a little random, as in Battle Brothers (working: uniform 8–12), then the **race trait gives +1 to one stat and −1 to another** (a wolfkin: DEX +1, INT −1; D-0110), so races don't force builds; humans get none. Talents are not weighted by race (Claude).
+**Starting stats** (D-0113): **each stat rolled on its own, 5–15 on a bell curve**, as in Battle Brothers (5 and 15 0.1%, 6 and 14 1%, 7 and 13 5%, 8 and 12 14%, 9 and 11 19%, 10 21.8%), then the **race trait gives +1 to one stat and −1 to another** (a wolfkin: DEX +1, INT −1; D-0110), so races don't force builds; humans get none. Talents are not weighted by race (Claude).
 
 **Races** (D-0108): **wolfkin** (DEX + / INT −), **catfolk** (CHA + / CON −), **elf** (INT + / STR −, D-0109), **dragonkin** (CON + / DEX −), **orc** (STR + / CHA −), **human** (none, D-0110). The shift is part of the race **trait** (D-0110). Humans come in four peoples, flavor only (looks, names, writing): **northerner** (Scandinavian), **western** (European), **eastern** (Japanese), **southern** (African). Orc STR + and catfolk CHA + are the designer's; the other shifts Claude's working. Exclusive skills: Beast Blood (wolfkin, catfolk), Ancient Blood (dragonkin), both also for shapeshifters.
 

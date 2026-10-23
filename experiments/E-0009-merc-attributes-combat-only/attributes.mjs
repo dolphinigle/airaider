@@ -6,9 +6,11 @@ const STATS = ['STR', 'DEX', 'INT', 'CHA', 'CON', 'LUK'];
 export const RACES = {
   human: null, wolfkin: ['DEX', 'INT'], catfolk: ['CHA', 'CON'], elf: ['INT', 'STR'], dragonkin: ['CON', 'DEX'], orc: ['STR', 'CHA'],   // D-0108; human peoples are flavor only
 };
-export const LOW = 8, HIGH = 12;                       // D-0112: each stat rolled on its own, uniform 8–12, like Battle Brothers
+// D-0113: each stat rolled on its own, 5–15 on a bell curve (designer's odds; 9–11 fill the rest)
+export const ODDS = { 5: 0.1, 6: 1, 7: 5, 8: 14, 9: 19, 10: 21.8, 11: 19, 12: 14, 13: 5, 14: 1, 15: 0.1 };
+const roll = r => { let x = r() * 100; for (const [v, p] of Object.entries(ODDS)) if ((x -= p) < 0) return +v; return 10; };
 export function recruit(r, race) {
-  const st = Object.fromEntries(STATS.map(s => [s, LOW + Math.floor(r() * (HIGH - LOW + 1))])), any = () => STATS[Math.floor(r() * 6)];
+  const st = Object.fromEntries(STATS.map(s => [s, roll(r)])), any = () => STATS[Math.floor(r() * 6)];
   const lean = RACES[race]; if (lean) { st[lean[0]]++; st[lean[1]]--; }   // the race trait's +1 / −1 (D-0110); human: none
   const talents = [any(), any()];                      // unweighted: race doesn't steer talents
   return { race, st, talents, hp: 30 + 3 * (st.CON - 10) };

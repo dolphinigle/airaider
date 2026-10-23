@@ -118,5 +118,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0109](D-0109-quest-and-fight-skill-xp-go-to-every-skill-check-xp-only-to-.md) | Quest and fight skill XP go to every skill; check XP only to the checked skill; elf is STR minus | accepted | designer | 2026-10-23 |
 | [D-0110](D-0110-race-and-gender-are-traits-a-race-trait-carries-its-stat-shi.md) | Race and gender are traits; a race trait carries its stat shift; humans and gender have no effect | accepted | designer | 2026-10-23 |
 | [D-0111](D-0111-race-traits-have-no-star.md) | Race traits have no star | accepted | designer | 2026-10-23 |
-| [D-0112](D-0112-starting-attributes-roll-each-stat-on-its-own-like-battle-br.md) | Starting attributes roll each stat on its own, like Battle Brothers | accepted | designer | 2026-10-23 |
+| [D-0112](D-0112-starting-attributes-roll-each-stat-on-its-own-like-battle-br.md) | Starting attributes roll each stat on its own, like Battle Brothers | superseded → D-0113 | designer | 2026-10-23 |
+| [D-0113](D-0113-starting-attributes-roll-5-to-15-on-a-bell-curve.md) | Starting attributes roll 5 to 15 on a bell curve | accepted | designer | 2026-10-23 |
 <!-- index:end -->
