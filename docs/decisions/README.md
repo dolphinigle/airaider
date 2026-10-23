@@ -113,5 +113,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0104](D-0104-abilities-and-skill-offers-are-rolled-at-recruitment-and-the.md) | Abilities and skill offers are rolled at recruitment and the AI picks them all up front; a weapon or magic skill's first ability has 0 cooldown; Lv 3 and Lv 5 skills are picks of 1 of 3 | accepted | designer | 2026-10-23 |
 | [D-0105](D-0105-beneath-me-adds-stress-per-node-and-increased-stress-taken-f.md) | Beneath me adds stress per node and increased stress taken for the whole quest; the designer's quest curve stands | accepted | designer | 2026-10-23 |
 | [D-0106](D-0106-race-shifts-one-stat-up-1-and-another-down-1-starting-stats-.md) | Race shifts one stat up 1 and another down 1; starting stats get mild randomness | accepted | designer | 2026-10-23 |
-| [D-0107](D-0107-races-wolfkin-catfolk-elf-dragonkin-and-human-with-four-huma.md) | "Races: wolfkin, catfolk, elf, dragonkin and human, with four human peoples" | accepted | designer | 2026-10-23 |
+| [D-0107](D-0107-races-wolfkin-catfolk-elf-dragonkin-and-human-with-four-huma.md) | "Races: wolfkin, catfolk, elf, dragonkin and human, with four human peoples" | superseded → D-0108 | designer | 2026-10-23 |
+| [D-0108](D-0108-races-add-orc-catfolk-shifts-cha.md) | "Races: wolfkin, catfolk, elf, dragonkin, orc and human, with four human peoples" | accepted | designer | 2026-10-23 |
 <!-- index:end -->

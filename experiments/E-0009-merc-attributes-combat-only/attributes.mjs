@@ -4,7 +4,7 @@ const rng = seed => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = M
 const STATS = ['STR', 'DEX', 'INT', 'CHA', 'CON', 'LUK'];
 // race leans (designer, 2026-10-23: +1 to one stat, −1 to another, so races don't force builds; placeholder roster, the AI reskins races)
 export const RACES = {
-  human: null, wolfkin: ['DEX', 'INT'], catfolk: ['LUK', 'CON'], elf: ['INT', 'CON'], dragonkin: ['CON', 'DEX'],   // D-0107; human peoples are flavor only
+  human: null, wolfkin: ['DEX', 'INT'], catfolk: ['CHA', 'CON'], elf: ['INT', 'CON'], dragonkin: ['CON', 'DEX'], orc: ['STR', 'CHA'],   // D-0108; human peoples are flavor only
 };
 export const MOVES = 3;                                // random coin moves: each takes 1 from a random stat and gives it to another
 export function recruit(r, race) {

@@ -6,7 +6,7 @@ status: done              # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: How do starting stats, races and talents roll, and what is each attribute worth in a fight (HP, speed, LUK)?
 verdict: race +1 / −1 and mildly random starting stats (D-0106); CON, DEX and LUK scales left to the balance pass (designer)  # one line, filled in when done: the answer
-decisions: [D-0106, D-0107]             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0106, D-0107, D-0108]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -23,7 +23,7 @@ Step 2 of the plan to a playtest, part 2 of merc details (after E-0008). Ruled: 
 Claude's draft (2026-10-23), proposed to the designer:
 - **Starting stats:** 10 each; race lean +2 / +1 / −1 (human: +1 on two random stats); then two coins move at random, never off the lean. Range about 8–13.
 - **Talents:** two draws, the race's lean stats twice as likely.
-- **Placeholder races:** human, wolfkin, catfolk, bearkin, elf, dwarf, dragonkin, giantkin. (Designer later set the roster, D-0107: wolfkin, catfolk, elf, dragonkin, human with four peoples.)
+- **Placeholder races:** human, wolfkin, catfolk, bearkin, elf, dwarf, dragonkin, giantkin. (Designer later set the roster, D-0107: wolfkin, catfolk, elf, dragonkin, human with four peoples; D-0108 added orc, catfolk CHA.)
 - **CON:** max HP 30 at CON 10, ±3 a point (Lv 1 about 27–39, Lv 10 tank about 60).
 - **DEX:** speed coins = DEX, flipped each round. DEX 15 acts before DEX 12 71% of the time, before DEX 10 84%.
 - **LUK:** 1% a point instead of 0.5%, since LUK has no skills: LUK 20 = 60% heads, about 20% more from every coin.
