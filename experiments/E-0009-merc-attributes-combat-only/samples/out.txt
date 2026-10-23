@@ -1,0 +1,26 @@
+human      STR 12  DEX 10  INT 10  CHA 10  CON 10  LUK 10  talents INT+ STR+  HP 30
+wolfkin    STR 12  DEX 12  INT 8   CHA 10  CON 10  LUK 10  talents CHA+ DEX+  HP 30
+catfolk    STR 10  DEX 12  INT 9   CHA 10  CON 9   LUK 12  talents DEX+ CON+  HP 27
+bearkin    STR 13  DEX 9   INT 10  CHA 8   CON 12  LUK 10  talents LUK+ DEX+  HP 36
+elf        STR 10  DEX 11  INT 12  CHA 9   CON 11  LUK 9   talents DEX++  HP 33
+dwarf      STR 12  DEX 9   INT 11  CHA 8   CON 12  LUK 10  talents CON+ CHA+  HP 36
+dragonkin  STR 10  DEX 9   INT 11  CHA 9   CON 13  LUK 10  talents STR+ INT+  HP 39
+giantkin   STR 12  DEX 10  INT 9   CHA 9   CON 11  LUK 11  talents INT+ CHA+  HP 33
+human      STR 11  DEX 10  INT 10  CHA 10  CON 10  LUK 11  talents INT++  HP 30
+wolfkin    STR 11  DEX 12  INT 10  CHA 10  CON 10  LUK 9   talents STR++  HP 30
+catfolk    STR 10  DEX 12  INT 9   CHA 11  CON 9   LUK 11  talents DEX+ CHA+  HP 27
+bearkin    STR 12  DEX 9   INT 11  CHA 9   CON 12  LUK 9   talents CON+ DEX+  HP 36
+elf        STR 9   DEX 12  INT 12  CHA 10  CON 9   LUK 10  talents LUK+ DEX+  HP 27
+dwarf      STR 11  DEX 9   INT 9   CHA 10  CON 13  LUK 10  talents CHA+ CON+  HP 39
+dragonkin  STR 9   DEX 9   INT 12  CHA 10  CON 12  LUK 10  talents STR++  HP 36
+giantkin   STR 12  DEX 11  INT 10  CHA 9   CON 11  LUK 9   talents CHA+ CON+  HP 33
+chance the row DEX acts before the column DEX (ties split)
+      8     10    12    15    18    21    
+8      50%   32%   19%    8%    3%    1%  
+10     68%   50%   34%   16%    7%    3%  
+12     81%   66%   50%   29%   14%    6%  
+15     92%   84%   71%   50%   30%   16%  
+18     97%   93%   86%   70%   50%   32%  
+21     99%   97%   94%   84%   68%   50%  
+0.5% a point: LUK 8 → 49.0% heads (-2% damage) · LUK 10 → 50.0% heads (0% damage) · LUK 14 → 52.0% heads (4% damage) · LUK 18 → 54.0% heads (8% damage) · LUK 21 → 55.5% heads (11% damage)
+1% a point: LUK 8 → 48.0% heads (-4% damage) · LUK 10 → 50.0% heads (0% damage) · LUK 14 → 54.0% heads (8% damage) · LUK 18 → 58.0% heads (16% damage) · LUK 21 → 61.0% heads (22% damage)
