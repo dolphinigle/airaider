@@ -30,6 +30,7 @@ Rules:
 - **Rare ability bases that bend the skill's own core.** Detonate Burn (the foe takes all its remaining Burn now; the Burn ends) was the one 4★ the designer liked; it uses what the skill already does, in one clear line that resolves now. (E-0007)
 - **Ability names that say what they do.** Generic but descriptive (Heavy Advancing Lunge, Pet Attack, Short Range) so the AI can pick abilities for a merc before reskinning them. (E-0007)
 
+- **Quests as the merc XP unit, and anti-grind as a cost.** The designer moved merc XP from fights won to quest ends (fights and checks feed skills only), and zero XP on easy quests wasn't enough: an overleveled merc must pay (stress per node, increased stress taken) so carrying and farming are choices with a price. Designer ruling, untested in play. (E-0008)
 ## Doesn't work
 
 - **AI-written engaging story as the main source of fun.** v3 spent about a week on story pipelines (sagas, synopsis prompts, judge rounds) and the scorecard stayed near 6/10. (D-0002)

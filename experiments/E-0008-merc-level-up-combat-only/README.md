@@ -2,11 +2,11 @@
 id: E-0008
 title: Merc level up, combat only
 date: 2026-10-23
-status: running           # planned | running | done | abandoned
+status: done              # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: What XP curve, cap and combat gains should a merc level have, and how does a Lv 1 → 12 career feel?
-verdict:                  # one line, filled in when done: the answer
-decisions: [D-0102, D-0103, D-0104]             # decisions it led to or proposed, e.g. [D-0005]
+verdict: merc XP from quest ends on the designer's quest curve (Lv 10 in practice), a level gives 3 attribute coins, skills at Lv 3 and Lv 5, abilities rolled at recruitment, beneath-me stress (D-0102 to D-0105)  # one line, filled in when done: the answer
+decisions: [D-0102, D-0103, D-0104, D-0105]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -37,5 +37,7 @@ Claude's draft (2026-10-23), proposed to the designer:
 Samples: `samples/career-seed7.txt`, `samples/stats.txt`.
 
 ## Verdict
+
+Ruled in D-0102 to D-0105. Merc XP comes from quest ends; the designer's curve (1, 2, 2, 3, 3, 4, 5, 10, 20, 100, 1000, 10000) ends careers at Lv 10 in practice; a level gives three attribute coins; 2 + 2 starting skills, a battle skill at Lv 3 and a check skill at Lv 5 (pick 1 of 3); all abilities rolled and AI-picked at recruitment; overleveled mercs gain stress per node and take increased stress all quest. Claude's first draft (XP per fight, hard cap 12, flat penalty) was reshaped toward quests as the unit and stronger anti-grind.
 
 ## Next

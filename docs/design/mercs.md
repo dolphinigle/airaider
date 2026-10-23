@@ -101,8 +101,8 @@ Two random draws over the six stats at recruitment. They may land on the same st
 - **Merc XP comes from quest ends** (D-0102); the curve counts quests done. Fights and skill checks give small **skill** XP only; quest ends give skill XP too.
 - XP from quests **below the merc's level is penalized**, as in Path of Exile; **4+ levels below gives none** (D-0102). Quests have levels.
 - At the XP threshold a **Level up** button appears; the player presses it **at the base, between quests** (D-0102). XP overflows into the next level.
-- Working: 100 XP for a quest at the merc's level (Claude). **Quests at level to the next level** (designer, 2026-10-23, "maybe"; replaces D-0102's working curve): 1, 2, 2, 3, 3, 4, 5, 10, 20, 100, 1000, 10000, so Lv 8 after 20 quests, Lv 10 after 50, Lv 11 after 150, Lv 12 after 1150. Penalty: full XP down to 1 below, 2 below 50%, 3 below 20% (Claude).
-- **Beneath me** (D-0103): a merc 3 levels above the quest gains 25 stress at every node, 4+ above 50 (working); skill XP follows the same penalty.
+- Working: 100 XP for a quest at the merc's level (Claude). **Quests at level to the next level** (designer, D-0105; replaces D-0102's working curve): 1, 2, 2, 3, 3, 4, 5, 10, 20, 100, 1000, 10000, so Lv 8 after 20 quests, Lv 10 after 50, Lv 11 after 150, Lv 12 after 1150: in practice mercs end at Lv 10. Penalty: full XP down to 1 below, 2 below 50%, 3 below 20% (Claude).
+- **Beneath me** (D-0105): a merc 3 levels above the quest gains 25 stress at every node and takes 50% increased stress all quest; 4+ above, 50 a node and 100% increased (working); skill XP follows the same penalty.
 
 ## Level up
 
