@@ -6,7 +6,7 @@ status: running           # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: How do starting stats, races and talents roll, and what is each attribute worth in a fight (HP, speed, LUK)?
 verdict:                  # one line, filled in when done: the answer
-decisions: []             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0106]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -28,6 +28,8 @@ Claude's draft (2026-10-23), proposed to the designer:
 - **DEX:** speed coins = DEX, flipped each round. DEX 15 acts before DEX 12 71% of the time, before DEX 10 84%.
 - **LUK:** 1% a point instead of 0.5%, since LUK has no skills: LUK 20 = 60% heads, about 20% more from every coin.
 - **Two-attribute skills:** average, rounded up.
+
+**Designer, 2026-10-23 (D-0106):** race only +1 / −1 so it doesn't force builds; starting stats mildly random. Now: three random coin moves within 8–12, then the race's +1 / −1; talents unweighted. 82% of starting stats at 9–11.
 
 ## Verdict
 

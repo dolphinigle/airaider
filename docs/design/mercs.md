@@ -19,7 +19,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
 | **LUK** | luck | none (D-0095) | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
 
-Starting stats are a little randomized, biased by **race**; a wolfkin leans DEX (D-0018).
+**Starting stats** (D-0106): every stat starts at 10, then mild randomness (working: three random coin moves, each stat kept within 8–12), then the **race gives +1 to one stat and −1 to another** (a wolfkin: DEX +1, INT −1), so races don't force builds. Talents are not weighted by race (Claude).
 
 ## Skills (D-0021, D-0022)
 

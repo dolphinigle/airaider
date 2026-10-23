@@ -2,19 +2,18 @@
 //   node attributes.mjs recruits [seed]  → sample recruits   ·   node attributes.mjs speed  → who acts first   ·   node attributes.mjs luk  → LUK's worth
 const rng = seed => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const STATS = ['STR', 'DEX', 'INT', 'CHA', 'CON', 'LUK'];
-// race leans (placeholder roster; the AI reskins races): +2 and +1 on two stats, −1 on one; human: +1 on two random stats
+// race leans (designer, 2026-10-23: +1 to one stat, −1 to another, so races don't force builds; placeholder roster, the AI reskins races)
 export const RACES = {
-  human: null, wolfkin: ['DEX', 'STR', 'INT'], catfolk: ['DEX', 'LUK', 'CON'], bearkin: ['STR', 'CON', 'DEX'],
-  elf: ['INT', 'DEX', 'CON'], dwarf: ['CON', 'STR', 'CHA'], dragonkin: ['CON', 'INT', 'DEX'], giantkin: ['STR', 'CON', 'INT'],
+  human: null, wolfkin: ['DEX', 'INT'], catfolk: ['DEX', 'CON'], bearkin: ['STR', 'DEX'],
+  elf: ['INT', 'CON'], dwarf: ['CON', 'CHA'], dragonkin: ['CON', 'DEX'], giantkin: ['STR', 'INT'],
 };
+export const MOVES = 3;                                // random coin moves: each takes 1 from a random stat and gives it to another
 export function recruit(r, race) {
-  const st = Object.fromEntries(STATS.map(s => [s, 10])), lean = RACES[race];
-  if (lean) { st[lean[0]] += 2; st[lean[1]] += 1; st[lean[2]] -= 1; }
-  else { const a = STATS[Math.floor(r() * 6)]; let b; do b = STATS[Math.floor(r() * 6)]; while (b === a); st[a]++; st[b]++; }
-  const keep = lean ? lean.slice(0, 2) : [], from = STATS.filter(s => !keep.includes(s));
-  for (let i = 0; i < 2; i++) { st[from[Math.floor(r() * from.length)]]--; st[STATS[Math.floor(r() * 6)]]++; }  // a little random: two coins move, never off the race's lean
-  const w = STATS.map(s => lean && (s === lean[0] || s === lean[1]) ? 2 : 1), draw = () => { let x = r() * w.reduce((a, b) => a + b), i = 0; while ((x -= w[i]) > 0) i++; return STATS[i]; };
-  const talents = [draw(), draw()];                                                   // race-lean stats twice as likely
+  const st = Object.fromEntries(STATS.map(s => [s, 10])), any = () => STATS[Math.floor(r() * 6)];
+  for (let i = 0; i < MOVES; i++) { let a, b; do { a = any(); b = any(); } while (a === b || st[a] <= 8 || st[b] >= 12); st[a]--; st[b]++; }  // RNG, kept within 8–12
+  let lean = RACES[race]; if (!lean) { const a = any(); let b; do b = any(); while (b === a); lean = [a, b]; }               // human: a random +1 / −1
+  st[lean[0]]++; st[lean[1]]--;
+  const talents = [any(), any()];                      // unweighted: race doesn't steer talents
   return { race, st, talents, hp: 30 + 3 * (st.CON - 10) };
 }
 const binom = (n, p) => { const d = Array(n + 1).fill(0); d[0] = 1; for (let i = 0; i < n; i++) for (let k = i + 1; k > 0; k--) d[k] = d[k] * (1 - p) + d[k - 1] * p, k === 1 && (d[0] *= 1 - p); return d; };
@@ -25,6 +24,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (cmd === 'recruits') {
     const r = rng(+a || 3);
     for (const race of Object.keys(RACES)) { const m = recruit(r, race); console.log(`${race.padEnd(10)} ${STATS.map(s => `${s} ${String(m.st[s]).padEnd(2)}`).join('  ')}  talents ${m.talents[0] === m.talents[1] ? m.talents[0] + '++' : m.talents.join('+ ') + '+'}  HP ${m.hp}`); }
+  } else if (cmd === 'spread') {
+    const r = rng(1), N = 20000, hist = {}; let spread = 0;
+    for (let i = 0; i < N; i++) { const m = recruit(r, 'human'); for (const s of STATS) hist[m.st[s]] = (hist[m.st[s]] || 0) + 1; spread += Math.max(...STATS.map(s => m.st[s])) - Math.min(...STATS.map(s => m.st[s])); }
+    console.log('starting stat values (all stats, human): ' + Object.keys(hist).sort((a, b) => a - b).map(k => `${k}: ${(hist[k] / N / 6 * 100).toFixed(0)}%`).join('  ') + `  · highest − lowest stat, average ${(spread / N).toFixed(1)}`);
   } else if (cmd === 'speed') {
     const D = [8, 10, 12, 15, 18, 21];
     console.log('chance the row DEX acts before the column DEX (ties split)\n      ' + D.map(d => String(d).padEnd(6)).join(''));

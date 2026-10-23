@@ -112,4 +112,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0103](D-0103-mercs-sent-on-quests-far-below-their-level-gain-stress-and-e.md) | Mercs sent on quests far below their level gain stress and earn no XP | superseded → D-0105 | designer | 2026-10-23 |
 | [D-0104](D-0104-abilities-and-skill-offers-are-rolled-at-recruitment-and-the.md) | Abilities and skill offers are rolled at recruitment and the AI picks them all up front; a weapon or magic skill's first ability has 0 cooldown; Lv 3 and Lv 5 skills are picks of 1 of 3 | accepted | designer | 2026-10-23 |
 | [D-0105](D-0105-beneath-me-adds-stress-per-node-and-increased-stress-taken-f.md) | Beneath me adds stress per node and increased stress taken for the whole quest; the designer's quest curve stands | accepted | designer | 2026-10-23 |
+| [D-0106](D-0106-race-shifts-one-stat-up-1-and-another-down-1-starting-stats-.md) | Race shifts one stat up 1 and another down 1; starting stats get mild randomness | accepted | designer | 2026-10-23 |
 <!-- index:end -->
